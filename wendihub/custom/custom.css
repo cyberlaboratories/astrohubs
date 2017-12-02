@@ -1,0 +1,30 @@
+/*#ipython_notebook {
+    height: 40px !important;
+}*/
+#ipython_notebook img{display:none;}
+#ipython_notebook img{                                                                                        
+        display:block;
+        background: url(astrohub_logo.png) no-repeat;
+        background-size: contain;
+        width: 233px;
+        height: 33px;
+        padding-left: 233px;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+}
+/*
+#header-container {
+        display: flex;
+        justify-content: space-between;
+}
+
+span#login_widget {
+        flex-grow: 1;
+        order: 4;
+        display: flex;
+        justify-content: flex-end;
+}
+
+span#save_widget {
+       flex-grow: 40;
+}*/
