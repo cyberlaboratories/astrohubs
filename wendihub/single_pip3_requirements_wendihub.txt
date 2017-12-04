@@ -28,6 +28,7 @@ h5py==2.7.1
 #jupyterhub==0.8.0b4
 #jupyterlab
 jupyter-nbextensions-configurator==0.2.8
+jupyter-contrib-nbextensions==0.3.3
 Keras==2.0.8
 #Mako==1.0.7
 Markdown==2.6.9

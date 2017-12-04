@@ -1,4 +1,4 @@
-FROM cyberlaboratories/corehubsingleuser
+FROM cyberhubs/corehub
 
 MAINTAINER Falk Herwig
 
