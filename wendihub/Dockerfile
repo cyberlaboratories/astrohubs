@@ -34,13 +34,15 @@ RUN python2 -m pip install ipykernel && python2 -m ipykernel install && python2 
 #RUN pip2 install jupyter_contrib_nbextensions && \
 #    pip3 install jupyter_contrib_nbextensions
 
-RUN mkdir /usr/local/bin/NuPyCEE && \
-    mkdir /usr/local/bin/WENDI && \
-    mkdir /tmp/wendiexamples
+RUN mkdir /opt/NuPyCEE && \
+    mkdir /tmp/WENDI && \
+    mkdir /opt/wendiexamples
 
-RUN git clone https://github.com/NuGrid/NuPyCEE.git /usr/local/bin/NuPyCEE && \
+RUN echo "Start here"
+
+RUN git clone https://github.com/NuGrid/NuPyCEE.git /opt/NuPyCEE && \
     git clone https://github.com/NuGrid/wendi-examples.git /tmp/wendiexamples/ && \
-    git clone https://github.com/NuGrid/WENDI.git /usr/local/bin/WENDI
+    git clone https://github.com/NuGrid/WENDI.git /opt/WENDI
 
 RUN pip3 install git+https://github.com/NuGrid/NuGridPy.git && \
     pip2 install git+https://github.com/NuGrid/NuGridPy.git
@@ -51,9 +53,13 @@ COPY singleuser.sh /srv/singleuser/singleuser.sh
 
 RUN mkdir '/home/user/notebooks/Stellar Yields for Galactic Modeling Applications (SYGMA)' && \
     mkdir '/home/user/notebooks/Stellar Yields for Galactic Modeling Applications (SYGMA)/Analysis and plots from the SYGMA paper' && \
+    mkdir '/home/user/notebooks/One-zone Model for the Evolution of GAlaxies (OMEGA)' && \
+    mkdir '/home/user/notebooks/One-zone Model for the Evolution of GAlaxies (OMEGA)/OMEGA demo and teaching notebooks/' && \
     cp -r '/tmp/wendiexamples/Stellar evolution and nucleosynthesis data' /home/user/notebooks/ && \
-    cp '/usr/local/bin/WENDI/notebooks/SYGMA self-guided user interface.ipynb' '/home/user/notebooks/Stellar Yields for Galactic Modeling Applications (SYGMA)' && \
-    cp /usr/local/bin/NuPyCEE/DOC/Papers/SYGMA_paper/* '/home/user/notebooks/Stellar Yields for Galactic Modeling Applications (SYGMA)/Analysis and plots from the SYGMA paper/'
+    cp '/opt/WENDI/notebooks/SYGMA self-guided user interface.ipynb' '/home/user/notebooks/Stellar Yields for Galactic Modeling Applications (SYGMA)' && \
+    cp -r '/opt/WENDI/notebooks/OMEGA self-guided interface.ipynb' '/home/user/notebooks/One-zone Model for the Evolution of GAlaxies (OMEGA)' && \
+    cp /opt/NuPyCEE/DOC/Papers/SYGMA_paper/* '/home/user/notebooks/Stellar Yields for Galactic Modeling Applications (SYGMA)/Analysis and plots from the SYGMA paper/' && \
+    cp /opt/NuPyCEE/DOC/Teaching/OMEGA_notebooks/* '/home/user/notebooks/One-zone Model for the Evolution of GAlaxies (OMEGA)/OMEGA demo and teaching notebooks'
 
 COPY README.ipynb /home/user/
 
@@ -68,16 +74,14 @@ RUN jupyter nbextension enable codefolding/main && \
 RUN jupyter serverextension enable --py jupyterlab --sys-prefix &&\
     jupyter labextension install @jupyterlab/hub-extension
 
-ENV PYTHONPATH /usr/local/bin/:/usr/local/bin/WENDI/modules/:/usr/local/bin/NuPyCEE
-
 COPY  secret/nbsignatures.db /home/user/.local/share/jupyter/nbsignatures.db
 COPY  secret/notebook_secret /home/user/.local/share/jupyter/notebook_secret
 COPY  nbconfig/notebook.json /usr/local/etc/jupyter/nbconfig/notebook.json
 COPY  custom /home/user/.jupyter/custom
 
-ENV PYTHONPATH /usr/local/bin/:/usr/local/bin/WENDI/modules/:/usr/local/bin/NuPyCEE/
+ENV PYTHONPATH /usr/local/bin/:/opt/WENDI/modules/:/opt/NuPyCEE/
 
-RUN  chmod -R 775 /home/user/notebooks
+RUN chmod -R 775 /home/user/notebooks
 
 RUN chown -R user:user /home/user && \
     chmod -R 775 /home/user/ && \
@@ -96,4 +100,4 @@ CMD ["/bin/bash", "/srv/singleuser/singleuser.sh"]
 
 RUN /srv/singleuser/trusted_nb.sh
 
-ENV SYGMADIR /usr/local/bin/NuPyCEE
+ENV SYGMADIR /opt/NuPyCEE

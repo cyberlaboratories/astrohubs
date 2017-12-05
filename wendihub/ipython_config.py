@@ -9,6 +9,7 @@ c.InteractiveShellApp.exec_lines = [
 "import sygma as s\n",
 "import omega as o\n",
 "from SYGMA import start_SYGMA\n",
+"from OMEGA import start_OMEGA\n",
 "from IPython.display import HTML\n",
 "display(HTML(\'<style>.container { width:80% !important; }</style>\'))\n"
 ]
