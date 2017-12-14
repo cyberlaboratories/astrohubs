@@ -71,8 +71,8 @@ RUN jupyter nbextension enable codefolding/main && \
 
 ### Jupyter lab section #####
 
-RUN jupyter serverextension enable --py jupyterlab --sys-prefix &&\
-    jupyter labextension install @jupyterlab/hub-extension
+#RUN jupyter serverextension enable --py jupyterlab --sys-prefix &&\
+#    jupyter labextension install @jupyterlab/hub-extension
 
 COPY  secret/nbsignatures.db /home/user/.local/share/jupyter/nbsignatures.db
 COPY  secret/notebook_secret /home/user/.local/share/jupyter/notebook_secret
