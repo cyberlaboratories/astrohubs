@@ -14,7 +14,6 @@ COPY ./apt_packages_wendihub.txt /tmp/apt_packages_wendihub.txt
 
 RUN apt-get update && \
     apt-get -y install $(cat /tmp/apt_packages_wendihub.txt) && \
-    npm install -g configurable-http-proxy && \
     apt-get autoremove --yes && apt-get clean all && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -27,18 +26,13 @@ RUN pip3 install -r /tmp/requirements/single_pip3_requirements_wendihub.txt
 RUN python2 -m pip install ipykernel && python2 -m ipykernel install && python2 -m bash_kernel.install && \
     python3 -m pip install ipykernel && python3 -m ipykernel install && python3 -m bash_kernel.install
 
-
-###Add extensions that include the initialization cells and many others####
-
-# added to requirements file
-#RUN pip2 install jupyter_contrib_nbextensions && \
-#    pip3 install jupyter_contrib_nbextensions
+# *** adding content ***
 
 RUN mkdir /opt/NuPyCEE && \
     mkdir /tmp/WENDI && \
     mkdir /opt/wendiexamples
 
-RUN echo "Start here"
+RUN echo "Update content: 0"
 
 RUN git clone https://github.com/NuGrid/NuPyCEE.git /opt/NuPyCEE && \
     git clone https://github.com/NuGrid/wendi-examples.git /tmp/wendiexamples/ && \
@@ -68,11 +62,6 @@ RUN jupyter contrib nbextension install --system && \
 
 RUN jupyter nbextension enable codefolding/main && \
     jupyter nbextension enable init_cell/main
-
-### Jupyter lab section #####
-
-#RUN jupyter serverextension enable --py jupyterlab --sys-prefix &&\
-#    jupyter labextension install @jupyterlab/hub-extension
 
 COPY  secret/nbsignatures.db /home/user/.local/share/jupyter/nbsignatures.db
 COPY  secret/notebook_secret /home/user/.local/share/jupyter/notebook_secret
