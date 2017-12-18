@@ -26,6 +26,7 @@ RUN pip3 install -r /tmp/requirements/single_pip3_requirements_wendihub.txt
 RUN python2 -m pip install ipykernel && python2 -m ipykernel install && python2 -m bash_kernel.install && \
     python3 -m pip install ipykernel && python3 -m ipykernel install && python3 -m bash_kernel.install
 
+RUN echo "Rebuild from here: 4"
 
 RUN git clone https://github.com/NuGrid/NuPyCEE.git /opt/NuPyCEE && \
     git clone https://github.com/NuGrid/wendi-examples.git /tmp/wendiexamples/ && \
