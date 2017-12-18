@@ -31,7 +31,7 @@ idna==2.6
 #jupyter-client==5.1.0
 #jupyter-console==5.2.0
 #jupyter-core==4.3.0
-#jupyterlab
+jupyterlab==0.29.1
 jupyter-nbextensions-configurator==0.2.8
 jupyter-contrib-nbextensions==0.3.3
 Keras==2.0.8
