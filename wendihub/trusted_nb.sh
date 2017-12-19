@@ -19,3 +19,5 @@ jupyter trust '/home/user/notebooks/Stellar evolution and nucleosynthesis data/E
 jupyter trust '/home/user/notebooks/Stellar evolution and nucleosynthesis data/Examples/decay_isotope_and_elements.ipynb'
 jupyter trust '/home/user/notebooks/Stellar evolution and nucleosynthesis data/Examples/using_specific_nugridpy_release.ipynb'
 jupyter trust '/home/user/notebooks/Stellar evolution and nucleosynthesis data/Examples/write_initial_abu_test.ipynb'
+jupyter trust '/home/user/notebooks/One-zone Model for the Evolution of GAlaxies/OMEGA self-guided interface.ipynb'
+jupyter trust '/home/user/notebooks/One-zone Model for the Evolution of GAlaxies/OMEGA demo and teaching notebooks/*.ipynb'
