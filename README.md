@@ -1,11 +1,11 @@
 # Application hubs guide
 
-A note on the terminology: We refer to singleuser as being the software stack that the user directly interacts with. The _singleusers_ in _astrohub_ are different from the singular _singleuser_ used in `cyberhubs/corehub`. The _astrohub_ _singleuser_ images use the `cyberhubs/corehub` singleuser image to build. This means that before the _astrohub_ _singleusers_ are deployed, the corehub _singleuser_ and _multiuser_ must be built. See GitHub `cyberlaboratories/cyberhubs` for access to corehub.  
+A note on the terminology: We refer to _singleuser_ as being the software stack that the user directly interacts with. The _singleusers_ in _astrohub_ are different from the singular _singleuser_ used in `cyberhubs/corehub`. The _astrohub_ _singleuser_ images use the `cyberhubs/corehub` _singleuser_ image to build. This means that before the _astrohub_ _singleusers_ are deployed, the corehub _singleuser_ and _multiuser_ must be built. See GitHub `cyberlaboratories/cyberhubs` for access to corehub.  
 
 ## User Guide
-To deploy the singleuser image of the desired _astrohub_, navigate to the directory of the singleuser you wish to employ (_wendihub_, _mlhub_, _mesahub_, etc).
+To deploy the _singleuser_ image of the desired _astrohub_, navigate to the directory of the _singleuser_ you wish to employ (_wendihub_, _mlhub_, _mesahub_, etc).
 
-Next step is to configure the `jupyterhub-config-script.sh`, specifically, the environment variable `JUPYTER_SGLEUSR_IMG` should be set to the name of the singleuser you would like. Typically, choose a name like `cyberhubs/wendihub` or `cyberhubs/nameofsingleuser`. To set environment variables once script is edited, just use the 
+Next step is to configure the `jupyterhub-config-script.sh`, specifically, the environment variable `JUPYTER_SGLEUSR_IMG` should be set to the name of the _singleuser_ you would like. Typically, choose a name like `cyberhubs/wendihub` or `cyberhubs/nameofsingleuser`. To set environment variables once script is edited, just use the 
 ```source jupyterhub-config-script.sh``` 
 command.
 
