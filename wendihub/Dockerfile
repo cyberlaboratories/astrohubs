@@ -14,7 +14,6 @@ COPY ./apt_packages_wendihub.txt /tmp/apt_packages_wendihub.txt
 
 RUN apt-get update && \
     apt-get -y install $(cat /tmp/apt_packages_wendihub.txt) && \
-    npm install -g configurable-http-proxy && \
     apt-get autoremove --yes && apt-get clean all && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
