@@ -4,12 +4,17 @@ c = get_config()
 c.InteractiveShellApp.matplotlib = "nbagg"
 
 c.InteractiveShellApp.exec_lines = [
-"%pylab inline\n",
+"%pylab\n",
 "%nbagg\n",
 "import sygma as s\n",
 "import omega as o\n",
+"import nugridpy.nugridse as mp\n",
+"import nugridpy.mesa as ms\n",
+"from NuGrid_Mesa_Explorer_py3 import start_explorer\n",
 "from SYGMA import start_SYGMA\n",
 "from OMEGA import start_OMEGA\n",
+"ms.set_nugrid_path('/data/nugrid_apod2')\n",
+"mp.set_nugrid_path('/data/nugrid_apod2')\n",
 "from IPython.display import HTML\n",
 "display(HTML(\'<style>.container { width:80% !important; }</style>\'))\n"
 ]
