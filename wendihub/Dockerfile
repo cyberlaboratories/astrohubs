@@ -82,6 +82,7 @@ WORKDIR /home/user
 COPY ipython_config.py /etc/ipython/ipython_config.py
 CMD ["/bin/bash", "/srv/singleuser/singleuser.sh"]
 
+RUN ln -s /data/nugrid_cedar /tmp/nugrid_data
 RUN /srv/singleuser/trusted_nb.sh
 
 ENV SYGMADIR /opt/NuPyCEE

@@ -1,5 +1,3 @@
-jupyter trust '/home/user/notebooks/Untitled.ipynb'
-jupyter trust '/home/user/notebooks/Untitled1.ipynb'
 jupyter trust '/home/user/notebooks/Stellar evolution and nucleosynthesis data/Star_explore.ipynb'
 jupyter trust '/home/user/notebooks/Stellar evolution and nucleosynthesis data/NuGrid Set Explorer self-guided interface.ipynb'
 jupyter trust '/home/user/notebooks/Stellar evolution and nucleosynthesis data/README.ipynb'

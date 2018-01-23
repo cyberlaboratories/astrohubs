@@ -13,8 +13,8 @@ c.InteractiveShellApp.exec_lines = [
 "from NuGrid_Mesa_Explorer_py3 import start_explorer\n",
 "from SYGMA import start_SYGMA\n",
 "from OMEGA import start_OMEGA\n",
-"ms.set_nugrid_path('/data/nugrid_apod2')\n",
-"mp.set_nugrid_path('/data/nugrid_apod2')\n",
+"ms.set_nugrid_path('/tmp/nugrid_data')\n",
+"mp.set_nugrid_path('/tmp/nugrid_data')\n",
 "from IPython.display import HTML\n",
 "display(HTML(\'<style>.container { width:80% !important; }</style>\'))\n"
 ]
