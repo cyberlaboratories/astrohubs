@@ -1,0 +1,9 @@
+subversion
+rsync
+libopenblas-dev
+texlive-publishers
+texlive-generic-recommended
+texlive-latex-base
+dvipng=1.15-0ubuntu1
+texlive-latex-extra
+texlive-fonts-recommended

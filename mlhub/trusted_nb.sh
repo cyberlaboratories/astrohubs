@@ -1,0 +1,1 @@
+echo "Adding Trusted Notebooks..."
