@@ -10,7 +10,8 @@ mesa_source_dir=$mesa_user_dir/mesa_$mesa_version
 
 # probably nothing needs to be changed below here
 [ ! -d $mesa_user_dir ] && mkdir $mesa_user_dir
-if [ ! -d $mesa_source_dir ] then
+if [ ! -d $mesa_source_dir ] 
+then
     svn co -r $mesa_version svn://svn.code.sf.net/p/mesa/code/trunk $mesa_source_dir
     ln -s $mesa_source_dir $MESA_DIR  # $MESA_DIR is defined in .bash_aliases
     cd $mesa_source_dir/utils
@@ -22,4 +23,4 @@ if [ ! -d $mesa_source_dir ] then
     echo "MESA installation version $mesa_version complete in $mesa_source_dir"
 else
     echo "MESA version $mesa_version already installed in $mesa_source_dir."
-
+fi
