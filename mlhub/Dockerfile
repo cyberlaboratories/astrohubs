@@ -32,7 +32,7 @@ COPY jupyterhub-singleuser /usr/local/bin/jupyterhub-singleuser
 
 COPY singleuser.sh /srv/singleuser/singleuser.sh
 
-COPY README.ipynb /home/user/
+COPY README_MLhub.ipynb /home/user/notebooks
 
 #RUN jupyter contrib nbextension install --system && \
 #    jupyter nbextension enable --py --sys-prefix widgetsnbextension 

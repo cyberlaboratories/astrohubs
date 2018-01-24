@@ -50,8 +50,6 @@ RUN mkdir '/home/user/notebooks/Stellar Yields for Galactic Modeling Application
     cp /opt/NuPyCEE/DOC/Papers/SYGMA_paper/* '/home/user/notebooks/Stellar Yields for Galactic Modeling Applications (SYGMA)/Analysis and plots from the SYGMA paper/' && \
     cp /opt/NuPyCEE/DOC/Teaching/OMEGA_notebooks/* '/home/user/notebooks/One-zone Model for the Evolution of GAlaxies (OMEGA)/OMEGA demo and teaching notebooks'
 
-COPY README.ipynb /home/user/
-
 RUN jupyter contrib nbextension install --system && \
     jupyter nbextension enable --py --sys-prefix widgetsnbextension 
 

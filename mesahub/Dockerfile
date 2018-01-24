@@ -72,7 +72,7 @@ RUN jupyter serverextension enable --py jupyterlab --sys-prefix &&\
     jupyter labextension install @jupyterlab/hub-extension@0.6.0 
 
 COPY .bash_aliases /home/user
-COPY README.ipynb  /home/user/notebooks
+COPY README_mesa.ipynb  /home/user/notebooks
 
 RUN chown -R user:user /home/user && \
     chmod -R 775 /home/user/ && \
