@@ -1,10 +1,17 @@
 # this script installs mesa in the the mesahub cyberhubs application
 # https://github.com/cyberlaboratories/astrohubs
 #
+# One optional argument: installation location (defaults to /user/mesa)
+#
 # 2018, Falk Herwig, UVic
 #
 # define some things
-mesa_user_dir=/user/mesa
+if [ ! $1 == "" ]
+then
+    mesa_user_dir=$1
+else
+    mesa_user_dir=/user/mesa
+fi
 mesa_version=9331
 mesa_source_dir=$mesa_user_dir/mesa_$mesa_version
 
@@ -12,6 +19,7 @@ mesa_source_dir=$mesa_user_dir/mesa_$mesa_version
 [ ! -d $mesa_user_dir ] && mkdir $mesa_user_dir
 if [ ! -d $mesa_source_dir ] 
 then
+    echo Installing into $mesa_user_dir
     svn co -r $mesa_version svn://svn.code.sf.net/p/mesa/code/trunk $mesa_source_dir
     ln -s $mesa_source_dir $MESA_DIR  # $MESA_DIR is defined in .bash_aliases
     cd $mesa_source_dir/utils
