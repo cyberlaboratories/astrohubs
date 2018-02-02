@@ -87,3 +87,4 @@ COPY ipython_config.py /etc/ipython/ipython_config.py
 
 CMD ["/bin/bash", "/srv/singleuser/singleuser.sh"]
 
+RUN ln -s /home/user/notebooks/README_mesa.ipynb /home/user
