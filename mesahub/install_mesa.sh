@@ -9,7 +9,9 @@
 #
 # define some things
 mesa_user_dir=/user/mesa
-mesa_version=8845
+#mesa_version=8118
+#mesa_version=8845
+mesa_version=9331
 
 # probably nothing needs to be changed below here
 mesa_source_dir=$mesa_user_dir/mesa_$mesa_version
