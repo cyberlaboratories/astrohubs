@@ -45,12 +45,8 @@ COPY singleuser.sh /srv/singleuser/singleuser.sh
 
 RUN  chmod -R 775 /home/user/notebooks
 
-<<<<<<< HEAD
-RUN (cd /tmp; wget http://www.astro.wisc.edu/~townsend/resource/download/mesasdk/mesasdk-x86_64-linux-20160129.tar.gz) &&\
+RUN (cd /tmp/mesa; wget --user-agent=""  http://www.astro.wisc.edu/~townsend/resource/download/mesasdk/mesasdk-x86_64-linux-20160129.tar.gz) &&\
     tar xvfz /tmp/mesa/mesasdk-x86_64-linux-20160129.tar.gz -C /opt &&\
-=======
-RUN tar xvfz /tmp/mesa/mesasdk-x86_64-linux-20160129.tar.gz -C /opt &&\
->>>>>>> f2556d8d8ebcafec88e48b511eb2d6d571efb16b
     chmod 775 /tmp/mesa/mesa_utils_install.sh &&\
     /tmp/mesa/mesa_utils_install.sh &&\
     rm -rf /tmp/mesa
