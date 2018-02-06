@@ -1,0 +1,1 @@
+display -resize 1800x900 -trim $1 &

@@ -1,0 +1,71 @@
+#!/bin/bash
+
+# For gnuplot fonts
+export GDFONTPATH=/usr/share/fonts/liberation
+export GNUPLOT_DEFAULT_GDFONT=LiberationSans-Bold
+
+if [ "$1" = "" ] ; then
+    echo "Usage: eee <adump_file_filter> <field> <output> [logscale]"
+    ls *-000
+    exit 0
+fi
+
+
+touch do_not_display
+for i in $1
+do
+  ee $i $2 $3 $4 $5 $6 $7 $8 $9
+  last=$i
+done
+rm do_not_display
+
+
+mypltfile=`ls -1t *.plt | head -1`
+grep xlabel $mypltfile   > bar.plt
+grep ylabel $mypltfile  >> bar.plt
+###echo "set ylabel '$2'"               >> bar.plt
+
+if [ "$4" = "logscale" ] ; then echo "set logscale y" >> bar.plt; fi
+if [ "$5" = "logscale" ] ; then echo "set logscale y" >> bar.plt; fi
+if [ "$6" = "logscale" ] ; then echo "set logscale y" >> bar.plt; fi
+if [ "$7" = "logscale" ] ; then echo "set logscale y" >> bar.plt; fi
+if [ "$8" = "logscale" ] ; then echo "set logscale y" >> bar.plt; fi
+if [ "$9" = "logscale" ] ; then echo "set logscale y" >> bar.plt; fi
+
+# ==================================================
+# Get xcolumn spec. (including Xmax if needed) from plot file
+#
+plotline=`grep plot $mypltfile`
+a=(`echo $plotline | tr '(' ' '`)
+b=(`echo ${a[3]} | tr '-' ' ' | tr ':' ' ' `)
+vuse1=`echo ${b[0]}`
+
+if [ "$vuse1" != "1" ] ; then
+  echo "is flipped"
+  cuse1="($vuse1 - \$1)"
+else
+  echo "is not flipped"
+  cuse1=$vuse1
+fi
+# ==================================================
+
+
+echo "plot \\"         >> bar.plt
+for i in $1
+do
+  root=`echo $i | cut -c 1-10`
+  if [ "$i" = "$last" ] ; then
+  echo " '${root}-${2}.${3}' using ${cuse1}:2 title '${root}' with lines lw 2" >> bar.plt
+  else
+  echo " '${root}-${2}.${3}' using ${cuse1}:2 title '${root}' with lines lw 2, \\" >> bar.plt
+  fi
+done
+
+
+run=`echo $i | cut -c 1-5`
+myname=${run}-${2}-${3}
+mv bar.plt $myname.plt
+dopd2 $myname
+
+#  plot 'xcf00-0002-Flx_AE01.xstrip' using 1:2 notitle with linespoints
+

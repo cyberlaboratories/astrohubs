@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# For gnuplot fonts
+export GDFONTPATH=/usr/share/fonts/liberation
+export GNUPLOT_DEFAULT_GDFONT=LiberationSans-Bold
+
+if [ "$1" = "" ] ; then
+    echo "Usage: eev <adump_file> \"<field1> <field2> ...\" <output> [logscale autoscale]"
+    ls *-000
+    exit 0
+fi
+
+root=`echo $1 | cut -c 1-10`
+rm -f plot_data_files
+rm -f ylabel_strings
+touch do_not_display
+for v in $2
+do
+  ee $1 $v $3 $4 $5 $6
+  echo ${root}-${v}.${3} >> plot_data_files
+  grep ylabel ${root}-${v}.${3}.plt >> ylabel_strings
+done
+rm do_not_display
+
+mypltfile=`ls -1t *.plt | head -1`
+grep xlabel $mypltfile > xlabel_string
+grep plot   $mypltfile >   plot_string
+
+gen_plt_file $3 $4 $5 $6
+dopd2 bar
+
+
+#  plot 'xcf00-0002-Flx_AE01.xstrip' using 1:2 notitle with linespoints
+

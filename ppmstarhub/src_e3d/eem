@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# For gnuplot fonts
+export GDFONTPATH=/usr/share/fonts/liberation
+export GNUPLOT_DEFAULT_GDFONT=LiberationSans-Bold
+
+if [ "$4" = "" ] ; then
+    echo "Produce a montage of merged miages in an  N by M tiling"
+    echo "Usage: eem <adump_file> \"<field1> <field2> ...\" <output> NxM"
+    echo "Example: eem cdi00-0150-000 \"AE01_C S_AE01_C_\" view 2x1"
+   echo "Avaialable dump files:"
+    ls *-000
+    exit 0
+fi
+
+outfilt=$3
+if [ "$3" = "view" ] ; then
+  outfilt=\?\?sof
+fi
+
+echo "rm -f aa.jpg"                       > doimagemerge
+echo "montage -geometry +4+4 -tile $4 \\" >> doimagemerge
+
+for dump in $1
+do
+
+root=`echo $dump | cut -c 1-10`
+touch do_not_display
+
+for v in $2
+do
+  ee $dump $v $3 $5 $6 $7 $8
+#  ls -l ${root}-${v}.${outfilt}.plt
+
+  for rootname in ${root}-${v}.${outfilt}
+  do
+    echo set terminal png size 1024,768 > foo.plt
+    echo set output \'$rootname.png\'  >> foo.plt
+    cat $rootname.plt                  >> foo.plt
+    gnuplot foo.plt
+    convert -trim $rootname.png xx.png
+    mv xx.png $rootname.png
+    ls -l $rootname.png
+    echo " $rootname.png \\" >> doimagemerge
+
+#   rm -f aa.png
+#   convert -resize 3000x1480 -trim cdi00-0150-AE01_C.RZsof.png a.png
+#   convert -resize 3000x1480 -trim cdi00-0150-S_AE01_C_.RZsof.png b.png
+#   montage -geometry +4+4 -tile 2x1 a.png b.png  aa.png
+#   disp aa.png
+
+  done
+done
+done
+rm do_not_display
+echo "    aa.png"            >> doimagemerge
+
+chmod 755 doimagemerge
+./doimagemerge
+
+
+#displaaay -resize 1024x1280 -trim aa.png &
+
+if [ ! -f display_in_notebook ] ; then
+  display -resize 1024x768 aa.png &
+else
+  cp aa.png cur_notebook_image.png
+fi
+

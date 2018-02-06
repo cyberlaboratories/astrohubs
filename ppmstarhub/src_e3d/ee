@@ -1,0 +1,720 @@
+#!/bin/bash
+
+# For gnuplot fonts
+export GDFONTPATH=/usr/share/fonts/liberation
+export GNUPLOT_DEFAULT_GDFONT=LiberationSans-Bold
+
+if [ "$1" = "" ] ; then
+    echo "Usage: ee <adump_file> [<field> <output> [viewhv,jpg,threshold,const=val]]"
+    echo "adump files in this directory:"
+    if [ ! -f *-000 ] ; then
+      if [ -f TECPLOT2D.PDT ] ; then
+        echo Making cdi00-0000-000 file for TECPLOT2D.PDT
+        echo "pdtfile     \"TECPLOT2D.PDT\"" > cdi00-0000-000
+        echo "xcoord      \"R (cm)\""       >> cdi00-0000-000
+        echo "ycoord      \"Z (cm)\""       >> cdi00-0000-000
+      fi
+    fi
+    ls *-000
+    exit 0
+fi
+
+if [ ! -f formulas.e3d ] ; then
+  echo "formulas.e3d is missing in this directory"
+  touch formulas.e3d
+  echo " Looking for example copies:"
+  for i in /soft/examples/e3d/formulas.e3d ~/formulas.e3d ~/bin/formulas.e3d
+  do
+    if [ -f $i ] ; then ls -l $i ; fi
+  done
+fi
+
+if [ -f $1 ] ; then
+  testfile=$1
+else
+  testfile=$(ls -1 *-000 | head -1)
+fi
+
+app=e3d
+if [ -f $testfile ] ; then
+  xxx=`head -1 $testfile | grep pdtfile`
+  yyy=`echo $xxx | cut -c 1-7`
+  if [ "$yyy" = "pdtfile" ] ; then
+    app=e3d_pdt
+  fi
+
+  xxx=`head -1 $testfile`
+  yyy=`echo $xxx | cut -c 1-11`
+  if [ "$yyy" = "hdf5_simple" ] ; then
+    app=e3d_hdf
+  fi
+  head -30 $testfile | grep coord > e3d_set_params
+fi
+
+if [ "$1" = "times" ] ; then
+  if [ -f dump_times ] ; then
+    mv dump_times old_dump_times
+  fi
+  for dumpfile in *-000
+  do
+    mytime=""
+    if [ -f old_dump_times ] ; then
+      mytime=$(grep $dumpfile old_dump_times | cut -c 16-)
+    fi
+    if [ "$mytime" = "" ] ; then
+      echo "dumpfile  \"$dumpfile\""  > input.e3d
+      echo "output    time"          >> input.e3d
+      $app  >> dump_times
+    else
+      echo "$dumpfile $mytime" >> dump_times
+    fi
+  done
+  if [ "$2" = "" ] ; then
+     cat dump_times
+  fi
+  exit 0
+fi
+
+if [[ "$1" = "xrange" || "$1" = "yrange" || "$1" = "zrange"  || "$1" = "Zrange" || "$1" = "Rrange"  || "$1" = "rrange" ]] ; then
+  if [ "$3" = "" ] ; then
+    rm -f ff-$1
+    echo $1 reset
+  else
+    echo "$1      $2  $3"    >  ff-$1
+    echo $1 set
+  fi
+  exit 0
+fi
+
+rm -f e3d_set_consts
+for xx in $4 $5 $6 $7 $8 $9
+do
+  if [ "$xx" != "" ] ; then echo "setconst " $xx >> e3d_set_consts ; fi
+  yy=$(echo $xx | cut -c 1-7)
+  if [ "$yy" = "nblend=" ] ; then export $xx ; fi
+  if [ "$yy" = "maxres=" ] ; then export $xx ; fi
+done
+
+################## OLD ##################
+# xx=$4; if [ "$xx" != "" ] ; then echo "setconst " $xx >> e3d_set_consts ; fi
+# xx=$5; if [ "$xx" != "" ] ; then echo "setconst " $xx >> e3d_set_consts ; fi
+# xx=$6; if [ "$xx" != "" ] ; then echo "setconst " $xx >> e3d_set_consts ; fi
+# xx=$7; if [ "$xx" != "" ] ; then echo "setconst " $xx >> e3d_set_consts ; fi
+# xx=$8; if [ "$xx" != "" ] ; then echo "setconst " $xx >> e3d_set_consts ; fi
+################## OLD ##################
+
+################## REALLY OLD ##################
+#xx=`echo $4 | grep =`; if [ "$xx" != "" ] ; then echo "setconst " $xx >> e3d_set_consts ; fi
+#xx=`echo $5 | grep =`; if [ "$xx" != "" ] ; then echo "setconst " $xx >> e3d_set_consts ; fi
+#xx=`echo $6 | grep =`; if [ "$xx" != "" ] ; then echo "setconst " $xx >> e3d_set_consts ; fi
+#xx=`echo $7 | grep =`; if [ "$xx" != "" ] ; then echo "setconst " $xx >> e3d_set_consts ; fi
+#xx=`echo $8 | grep =`; if [ "$xx" != "" ] ; then echo "setconst " $xx >> e3d_set_consts ; fi
+################## REALLY OLD ##################
+
+ARG=$2
+ARGS=$3
+isprofile=no
+iplot=no
+isstrip=no
+isxyzavs=no
+isxyslice=no
+isxzslice=no
+isyzslice=no
+isdist=no
+isdist3=no
+iscorr=no
+isspc3v=no
+isspc1s=no
+isstrfn3v=no
+isstrfnsc=no
+ialwaysredo=no
+isshjpg=no
+
+
+resize=""
+if [ "$5" != "" ] ; then
+resize="-resize $5"
+fi
+
+echo "dumpfile  \"$1\"" > input.e3d
+
+if [ "$2" = "" ] ; then
+    echo "output    show" >> input.e3d
+    $app
+    exit 0
+fi
+
+FIELD="field     $2"
+
+if [ "$3" = "" ] ; then
+    echo "If a field is specified, then an output target is required"
+    echo "Suported output formats:"
+    echo "  xstrip     Extracts an X-strip from the data"
+    echo "  ystrip     Extracts  a Y-strip from the data"
+    echo "  xyslice    Extracts  an XY-slice from the data"
+    echo "  xzslice    Extracts  a  XZ-slice from the data"
+    echo "  yzslice    Extracts  a  YZ-slice from the data"
+    echo "  xprof      generates a horizontal (X) profile"
+    echo "  yprof      generates a horizontal (Y) profile"
+    echo "  zprof      generates a vertical (Z) profile"
+    echo "  radprof    generates a radial profile"
+    echo "  dist       Generate histrogram, P.D.F., and Culmniative Dist."
+    echo "  dist3      Generate PDFs of 3 fields"
+    echo "  bof        generates a Brick-of-floats"
+    echo "  bof3v      generates one Brick-of-floats for each of 3 vector components"
+    echo "  hv         generates a block-tree hierarchy (.hv) file"
+    echo "  view       generates XY, YZ, ZX SOF average plots"
+    echo "  spc3v      generates spectrum of a 3D vector field"
+    echo "  spc1s      generates spectrum of a 1D scalar field"
+    echo "  strfn3v    generates structure fn of a 3D vector field"
+    echo "  strfnsc    generates structure fn of scalar field"
+    echo "  time       Report dumpname and time"
+    exit 0
+fi
+
+
+
+# 123456789 1234
+# rgb01-0040-000
+
+ADUMP=$1
+
+name=$(echo $ADUMP | awk -F/ '{print $NF}')
+ADROOT=`echo $name | colrm 12 14`
+EXTENTION=""
+
+
+#echo "Root Name:" $ADROOT
+
+pstring=`echo $3 | cut -b 2-8`
+
+# ------------- Build par file for each kind of analysis -------------------
+if [ "$3" = "radprof" ] ; then
+  echo "$FIELD"              >  f3dintail
+  echo "output    radprof"   >> f3dintail
+
+  EXTENTION=".radprof"
+  isprofile=yes
+fi
+
+if [ "$pstring" = "strip" ] ; then
+  echo "$FIELD"                 >  f3dintail
+  echo "output    $3 0 0" >> f3dintail
+
+  EXTENTION=".$3"
+  isstrip=yes
+  ialwaysredo=yes
+fi
+
+if [ "$3" = "strip" ] ; then
+  echo "$FIELD"                 >  f3dintail
+  echo "output    $3 0 0" >> f3dintail
+
+  EXTENTION=".strip"
+  isstrip=yes
+  ialwaysredo=yes
+fi
+
+
+if [ "$3" = "xyslice" ] ; then
+  if [ "$4" == "" ] ; then
+     echo "xyslice requires one argument"
+     echo "Synopsis:  ee <dump_file> <field> xyslice <z>"
+     echo "Example:   ee abc00-0123-000 RHO xyslice -3.5"
+     exit 0
+  fi
+  if [ ! -f $2.minmax ] ; then
+       echo "Must set HV range in file:   $2.minmax"
+       echo "Format for HV range file:"
+       echo "minmax          <min> <max>"
+       exit 0
+  fi
+
+  echo "$FIELD"                  >  f3dintail
+  echo "output    xyslice $4"    >> f3dintail
+  cat  $2.minmax                 >> f3dintail
+
+  EXTENTION=".xyslice"
+  isxyslice=yes
+  ialwaysredo=yes
+fi
+
+if [ "$3" = "view" ] ; then
+  echo "$FIELD"                  > f3dintail
+  echo "output    xyzavs"       >> f3dintail
+  if [ -f $2.minmax ] ; then
+  cat  $2.minmax                >> f3dintail
+  fi
+
+  EXTENTION=".xyzavs"
+  isxyzavs=yes
+  # ialwaysredo=yes
+  rm -f "$ADROOT""$2".??sof
+fi
+
+#####################################################
+#cout5=`echo $3 | cut -b 1-5`
+#if [ "$cout5" = "view_" ] ; then
+#  echo "$FIELD"                  > f3dintail
+#  echo "output    xyzavs"       >> f3dintail
+#  if [ -f $2.minmax ] ; then
+#  cat  $2.minmax                >> f3dintail
+#  fi
+#
+#  EXTENTION=".xyzavs"
+#  isxyzavs=yes
+#  # ialwaysredo=yes
+#  rm -f "$ADROOT""$2".??sof
+#fi
+#####################################################
+
+
+if [ "$3" = "vrz" ] ; then
+  echo "$FIELD"                  > f3dintail
+  echo "output    vrz"          >> f3dintail
+  if [ -f $2.minmax ] ; then
+  cat  $2.minmax                >> f3dintail
+  fi
+
+  EXTENTION=".vrz"
+  ialwaysredo=yes
+  isshjpg=yes
+fi
+
+if [ "$3" = "vry" ] ; then
+  echo "$FIELD"                  > f3dintail
+  echo "output    vry"          >> f3dintail
+  if [ -f $2.minmax ] ; then
+  cat  $2.minmax                >> f3dintail
+  fi
+
+  EXTENTION=".vry"
+  ialwaysredo=yes
+  isshjpg=yes
+fi
+
+if [ "$3" = "vrx" ] ; then
+  echo "$FIELD"                  > f3dintail
+  echo "output    vrx"          >> f3dintail
+  if [ -f $2.minmax ] ; then
+  cat  $2.minmax                >> f3dintail
+  fi
+
+  EXTENTION=".vrx"
+  ialwaysredo=yes
+  isshjpg=yes
+fi
+
+
+if [ "$3" = "xzslice" ] ; then
+  if [ "$4" == "" ] ; then
+     echo "xzslice requires one argument"
+     echo "Synopsis:  ee <dump_file> <field> xzslice <y>"
+     echo "Example:   ee abc00-0123-000 RHO xzslice -3.5"
+     exit 0
+  fi
+  if [ ! -f $2.minmax ] ; then
+       echo "Must set HV range in file:   $2.minmax"
+       echo "Format for HV range file:"
+       echo "minmax          <min> <max>"
+       exit 0
+  fi
+
+  echo "$FIELD"                  >  f3dintail
+  echo "output    xzslice $4"    >> f3dintail
+  cat  $2.minmax                 >> f3dintail
+
+  EXTENTION=".xzslice"
+  isxzslice=yes
+  ialwaysredo=yes
+fi
+
+if [ "$3" = "yzslice" ] ; then
+  if [ "$4" == "" ] ; then
+     echo "yzslice requires one argument"
+     echo "Synopsis:  ee <dump_file> <field> yzslice <x>"
+     echo "Example:   ee abc00-0123-000 RHO yzslice -3.5"
+     exit 0
+  fi
+  if [ ! -f $2.minmax ] ; then
+       echo "Must set HV range in file:   $2.minmax"
+       echo "Format for HV range file:"
+       echo "minmax          <min> <max>"
+       exit 0
+  fi
+
+  echo "$FIELD"                  >  f3dintail
+  echo "output    yzslice $4"    >> f3dintail
+  cat  $2.minmax                 >> f3dintail
+
+  EXTENTION=".yzslice"
+  isyzslice=yes
+  ialwaysredo=yes
+fi
+
+
+if [[ "$pstring" = "prof" || "$pstring" = "sect" ||  "$pstring" = "charge" ]] ; then
+  echo "$FIELD"        >  f3dintail
+  echo "output    $3" >> f3dintail
+
+  if [[ "$pstring" = "sect" || "$pstring" = "charge" ]] ; then
+  if [ -f $2.minmax ] ; then
+  cat  $2.minmax                >> f3dintail
+  fi
+  fi
+
+  EXTENTION=".$3"
+  iplot=yes
+  ialwaysredo=yes
+fi
+
+
+if [ "$3" = "bof" ] ; then
+  echo "$FIELD"          >  f3dintail
+  echo "output    bof"   >> f3dintail
+  EXTENTION=".bof"
+  if [ "$nblend" != "" ] ; then export EXTENTION=".b${nblend}bof" ; fi
+  if [ "$maxres" != "" ] ; then export EXTENTION=".mrbof" ; fi
+  echo "EXTENTION = " $EXTENTION
+
+##  if [ ! "$nblend" = "" ] ; then
+##    echo "nblend    $nblend"  >> f3dintail
+##    EXTENTION=".b${nblend}bof"
+##  fi
+##  if [ -f e3d_set_consts ] ; then
+##  if [ "`grep maxres e3d_set_consts`" != "" ] ; then
+##    EXTENTION=".mrbof"
+##  fi
+##  fi
+fi
+
+if [ "$3" = "bof3v" ] ; then
+  echo "$FIELD"            >  f3dintail
+  echo "output    bof3v"   >> f3dintail
+  EXTENTION=".bof"
+  if [ "$nblend" != "" ] ; then export EXTENTION=".b${nblend}bof" ; fi
+  if [ "$maxres" != "" ] ; then export EXTENTION=".mrbof" ; fi
+
+##  if [ -f e3d_set_consts ] ; then
+##    mytest=`grep maxres e3d_set_consts`
+##    if [ "$mytest" != "" ] ; then
+##      EXTENTION=".mrbof"
+##    else
+##      if [ ! "$4" = "" ] ; then
+##        echo "nblend    $4"  >> f3dintail
+##        EXTENTION=".b${4}bof"
+##      fi
+##    fi
+##  fi
+fi
+
+if [ "$3" = "correlate" ] ; then
+  echo "$FIELD"               >  f3dintail
+  echo "output    correlate" >> f3dintail
+
+  EXTENTION=".corr"
+  iscorr=yes
+fi
+
+if [ "$3" = "genview" ] ; then
+  echo "$FIELD"               >  f3dintail
+  echo "output    genview" >> f3dintail
+fi
+
+if [ "$3" = "dist" ] ; then
+  if [ ! -f $2.minmax ] ; then
+       echo "Must set range in file:   $2.minmax"
+       echo "Format for range file:"
+       echo "minmax          <min> <max>"
+       exit 0
+  fi
+  echo "$FIELD"         >  f3dintail
+  echo "output    dist" >> f3dintail
+  cat  $2.minmax        >> f3dintail
+
+  EXTENTION=".dist"
+  isdist=yes
+fi
+
+if [ "$3" = "dist3" ] ; then
+  if [ ! -f $2.minmax ] ; then
+       echo "Must set range in file:   $2.minmax"
+       echo "Format for range file:"
+       echo "minmax          <min> <max>"
+       exit 0
+  fi
+  echo "$FIELD"          >  f3dintail
+  echo "output    dist3" >> f3dintail
+  cat  $2.minmax         >> f3dintail
+  if [ "$4" != "" ] ; then
+  echo "threshold $4"    >> f3dintail
+  fi
+
+  EXTENTION=".dist3"
+  isdist3=yes
+fi
+
+if [ "$3" = "spc3v" ] ; then
+  echo "$FIELD"           >  f3dintail
+  echo "output    spc3v" >> f3dintail
+
+  EXTENTION=".spc3v"
+  isspc3v=yes
+fi
+
+if [ "$3" = "spc1s" ] ; then
+  echo "$FIELD"           >  f3dintail
+  echo "output    spc1s" >> f3dintail
+
+  EXTENTION=".spc1s"
+  isspc1s=yes
+fi
+
+if [ "$3" = "strfn3v" ] ; then
+  if [ ! -f structfn_XYdisp ] ; then
+       echo "Must set displacments in: structfn_XYdisp"
+       exit 0
+  fi
+  if [ ! -f $2.minmax ] ; then
+       echo "Must set HV range in file:   $2.minmax"
+       echo "Format for HV range file:"
+       echo "minmax          <min> <max>"
+       exit 0
+  fi
+  echo "$FIELD"             > f3dintail
+  echo "output    strfn3v" >> f3dintail
+  cat  $2.minmax           >> f3dintail
+
+  EXTENTION=".strfn3v"
+  isstrfn3v=yes
+fi
+
+if [ "$3" = "strfnsc" ] ; then
+  if [ ! -f structfn_XYdisp ] ; then
+       echo "Must set displacments in: structfn_XYdisp"
+       exit 0
+  fi
+  if [ ! -f $2.minmax ] ; then
+       echo "Must set HV range in file:   $2.minmax"
+       echo "Format for HV range file:"
+       echo "minmax          <min> <max>"
+       exit 0
+  fi
+  echo "$FIELD"             > f3dintail
+  echo "output    strfnsc" >> f3dintail
+  cat  $2.minmax           >> f3dintail
+
+  EXTENTION=".strfnsc"
+  isstrfnsc=yes
+fi
+
+
+if [ "$3" = "hv" ] ; then
+  if [ ! -f $2.minmax ] ; then
+       echo "Must set HV range in file:   $2.minmax"
+       echo "Format for HV range file:"
+       echo "minmax          <min> <max>"
+       exit 0
+  fi
+
+  echo "$FIELD"          >  f3dintail
+  echo "output    hv"    >> f3dintail
+  cat  $2.minmax         >> f3dintail
+
+  EXTENTION=".hv"
+fi
+
+if test -n "$(find . -maxdepth 1 -name 'ff-?range' -print -quit)"
+then
+  for iii in ff-?range
+  do
+  cat $iii >> f3dintail
+  done
+#  ialwaysredo=yes
+fi
+
+
+# ------------- run a3d if needed -------------------
+DATAFILE="$ADROOT""$2""$EXTENTION"
+
+#echo "Data File:" $DATAFILE
+
+iwilldoit=no
+if [ ! -f $DATAFILE ] ; then
+  iwilldoit=yes
+fi
+if [ "$ialwaysredo" = "yes" ] ; then
+  iwilldoit=yes
+fi
+
+# Only make file if it does not exist or needs to be done anyway
+if [ "$iwilldoit" = "yes" ] ; then
+   echo "dumpfile  \"$1\""  > input.e3d
+   if [ -f e3d_set_params ] ; then cat e3d_set_params   >> input.e3d ; fi
+   if [ -f e3d_set_consts ] ; then cat e3d_set_consts   >> input.e3d ; fi
+   if [ -f e3d_preferences ] ; then cat e3d_preferences >> input.e3d ; fi
+   cat f3dintail           >> input.e3d
+   $app
+fi
+
+
+# ------------- display results -------------------
+
+if [ "$isprofile" = "yes" ] ; then
+
+if [ ! -f $DATAFILE ] ; then
+  exit 0
+fi
+
+echo "       Average    Dispersion          RMS0           Min           Max"
+vert2stats < $DATAFILE
+fi
+
+if [ ! -f do_not_display ] ; then
+# Start Display Block: will NOT display if file "do_not_display" is in cwd
+
+# For any  plot which already has a plt file
+if [ "$iplot" = "yes" ] ; then
+  echo  $DATAFILE
+  ls -l  $DATAFILE
+  dopd2 ${DATAFILE}
+
+  # echo set terminal png size 1024,768 > foo.plt
+  # echo set output \'$DATAFILE.png\'   >> foo.plt
+  # cat ${DATAFILE}.plt                 >> foo.plt
+  # gnuplot foo.plt >& gnuplot.stderr
+  # display -trim -resize 1024x768 ${DATAFILE}.png &
+fi
+
+
+# For a profile output
+if [ "$isprofile" = "yes" ] ; then
+#   echo "plot '$DATAFILE' using 1:2 with linespoints,      \\"  > a.plt
+#   echo "     '$DATAFILE' using 1:2:3 with yerrorlines,    \\" >> a.plt
+#   echo "     '$DATAFILE' using 1:5 with lines,            \\" >> a.plt
+#   echo "     '$DATAFILE' using 1:6 with lines               " >> a.plt
+#   gnuplot -persist a.plt
+
+  echo set terminal png size 1024,768 > foo.plt
+  echo set output \'$DATAFILE.png\'   >> foo.plt
+  cat ${DATAFILE}.plt                 >> foo.plt
+#  gnuplot foo.plt >& gnuplot.stderr
+#  display -trim -resize 1024x768 ${DATAFILE}.png &
+  dopd2 ${DATAFILE}
+fi
+
+if [ "$isxyzavs" = "yes" ] ; then
+#ccccccccccccccccccccccccccccccccccccccccccc
+for rootname in "$ADROOT""$2".??sof
+do
+  echo $rootname
+  dopd2 $rootname
+#  echo set terminal png size 1024,1024 > foo.plt
+#  echo set output \'$rootname.png\'  >> foo.plt
+#  cat $rootname.plt                  >> foo.plt
+#  gnuplot foo.plt >& gnuplot.stderr
+#   display -trim -resize 1024x768 $rootname.png &
+done
+#ccccccccccccccccccccccccccccccccccccccccccc
+fi
+
+
+# e3d genratd a script that makes a jpg file
+if [ "$isshjpg" = "yes" ] ; then
+  source $DATAFILE.sh
+   display -resize 1024x768 $DATAFILE.jpg &
+fi
+
+# For slice output
+if [ "$isxyslice" = "yes" ] ; then
+source ffdatadims
+display -size ${FFXDIM}x${FFYDIM} -depth 8 -flip $resize gray:$DATAFILE &
+fi
+
+if [ "$isxzslice" = "yes" ] ; then
+source ffdatadims
+display -size ${FFXDIM}x${FFZDIM} -depth 8 -flip $resize gray:$DATAFILE &
+fi
+
+if [ "$isyzslice" = "yes" ] ; then
+source ffdatadims
+display -size ${FFYDIM}x${FFZDIM} -depth 8 -flip $resize gray:$DATAFILE &
+fi
+
+# For dist output
+if [ "$isdist" = "yes" ] ; then
+echo "set logscale y"                                > a.plt
+echo "plot '$DATAFILE' using 1:3 with linespoints"  >> a.plt
+gnuplot -persist a.plt
+fi
+
+if [ "$iscorr" = "yes" ] ; then
+if [ -f $DATAFILE ] ; then
+  dopd2 $DATAFILE
+else
+  echo Datafile $DATAFILE was not generated
+fi
+fi
+
+# For dist3 output
+if [ "$isdist3" = "yes" ] ; then
+echo "set logscale y"                                      > a.plt
+echo "plot '$DATAFILE' using 1:2 with linespoints,   \\"  >> a.plt
+echo "     '$DATAFILE' using 1:3 with linespoints 3, \\"  >> a.plt
+echo "     '$DATAFILE' using 1:4 with linespoints 4    "  >> a.plt
+gnuplot -persist a.plt
+fi
+
+# For spectrum of 3D vector field
+if [ "$isspc3v" = "yes" ] ; then
+echo "set logscale xy"                                                      > a.plt
+echo "plot '$DATAFILE' using 1:3 title \"Solenoidal\"    with lines lw 3, \\" >> a.plt
+echo "     '$DATAFILE' using 1:2 title \"Compressional\" with lines lw 3, \\" >> a.plt
+echo "     '$DATAFILE' using 1:4 title \"Total\"   with linespoints lw 3    " >> a.plt
+gnuplot -persist a.plt
+fi
+
+if [ "$isspc1s" = "yes" ] ; then
+echo "set logscale xy"                                     > a.plt
+echo "set xlabel \"k/k_0\""                               >> a.plt
+echo "set ylabel \"Power Specturm of $2\""                >> a.plt
+echo "plot '$DATAFILE' using 1:2 notitle with lines lw 3" >> a.plt
+dopd2 a
+#gnuplot -persist a.plt
+fi
+
+# For structure functions of 3D vector field
+if [ "$isstrfn3v" = "yes" ] ; then
+gnuplot -persist strfn3v.plt
+fi
+
+# For structure functions of 3D vector field
+if [ "$isstrfnsc" = "yes" ] ; then
+gnuplot -persist strfnsc.plt
+fi
+
+# For a profile output
+if [ "$isstrip" = "yes" ] ; then
+# echo ${DATAFILE}.plt
+# echo "plot '$DATAFILE' using 1:2 with linespoints"  > a.plt
+# gnuplot -persist a.plt
+#
+  dopd2 $DATAFILE
+#  echo set terminal png size 1024,768 > foo.plt
+#  echo set output \'$DATAFILE.png\'   >> foo.plt
+#  cat ${DATAFILE}.plt                 >> foo.plt
+#  gnuplot foo.plt >& gnuplot.stderr
+#  display -trim -resize 1024x768 ${DATAFILE}.png &
+fi
+
+# For hv output
+if [ "$4" = "viewhv" ] ; then
+  vv $DATAFILE
+fi
+
+if [ "$4" = "jpeg" ] ; then
+  hvr512jpg hvr
+fi
+
+# End Display Block
+fi

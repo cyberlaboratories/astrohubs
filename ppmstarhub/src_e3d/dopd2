@@ -1,0 +1,25 @@
+export GDFONTPATH=/usr/share/fonts/liberation
+export GNUPLOT_DEFAULT_GDFONT=LiberationSans-Regular
+#export GNUPLOT_DEFAULT_GDFONT=LiberationSans-Bold
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/tech/public/porter/e3d/lib
+
+#echo set terminal png size 1536,1024   > foo.plt
+echo set terminal png size 1024,768    > foo.plt
+#echo set terminal png size 600,400    > foo.plt
+echo set output \'$1.png\'            >> foo.plt
+cat $1.plt                            >> foo.plt
+gnuplot foo.plt
+#
+if [ ! -f do_not_convert ] ; then
+  mv $1.png mytmp.png
+  convert -trim mytmp.png $1.png
+  rm -f mytmp.png
+fi
+#
+if [ ! -f display_in_notebook ] ; then
+  display -resize 1024x768 $1.png &
+else
+  cp $1.png cur_notebook_image.png
+fi
+
+
