@@ -86,3 +86,22 @@ COPY ipython_config.py /etc/ipython/ipython_config.py
 CMD ["/bin/bash", "/srv/singleuser/singleuser.sh"]
 
 RUN ln -s /home/user/notebooks/README_ppmstar.ipynb /home/user
+
+RUN ln -s /user/dataA_rpod4 /home/user/notebooks
+RUN ln -s /user/dataA_rpod4 /home/user
+RUN ln -s /data/cedar_projects /home/user/notebooks
+RUN ln -s /data/cedar_projects /home/user
+RUN ln -s /data/ppm_rpod2 /home/user/notebooks
+RUN ln -s /data/ppm_rpod2 /home/user
+
+RUN ln -s /user/cedar_scratch_andrassy /home/user/notebooks
+RUN ln -s /user/cedar_scratch_andrassy /home/user
+RUN ln -s /user/cedar_scratch_djstephe /home/user/notebooks
+RUN ln -s /user/cedar_scratch_djstephe /home/user
+RUN ln -s /user/cedar_scratch_fherwig /home/user/notebooks
+RUN ln -s /user/cedar_scratch_fherwig /home/user
+RUN ln -s /user/cedar_scratch_ondrea /home/user/notebooks
+RUN ln -s /user/cedar_scratch_ondrea /home/user
+RUN ln -s /user/cedar_scratch_pavelden /home/user/notebooks
+RUN ln -s /user/cedar_scratch_pavelden /home/user
+
