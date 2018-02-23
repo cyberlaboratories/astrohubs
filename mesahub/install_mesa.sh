@@ -24,6 +24,10 @@ then
     cd $mesa_source_dir/utils
     sed -i s/"USE_PGSTAR = YES"/"USE_PGSTAR = NO"/g makefile_header
     sed -i /"LOAD_PGPLOT ="/c\ "LOAD_PGPLOT =" makefile_header
+    if [[ $mesa_version =~ ^7 ]]
+    then
+        sed -i '/FCbasic = -fno-range-check/s/$/ -Wno-uninitialized/' makefile_header
+    fi
     cd ..
     ./clean
     ./install
