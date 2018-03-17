@@ -32,9 +32,6 @@ RUN git clone https://github.com/NuGrid/NuPyCEE.git /opt/NuPyCEE && \
     git clone https://github.com/NuGrid/wendi-examples.git /tmp/wendiexamples/ && \
     git clone https://github.com/NuGrid/WENDI.git /opt/WENDI
 
-RUN pip3 install git+https://github.com/NuGrid/NuGridPy.git && \
-    pip2 install git+https://github.com/NuGrid/NuGridPy.git
-
 COPY jupyterhub-singleuser /usr/local/bin/jupyterhub-singleuser
 
 COPY singleuser.sh /srv/singleuser/singleuser.sh
