@@ -13,7 +13,8 @@ mesa_user_dir=/user/mesa
 #mesa_version=7184 # --> Austin (massive stars)
 #mesa_version=8118 # --> Ondrea (Pop III)
 #mesa_version=8845 # --> Jacqueline (rotating models, massive stars in the future)
-mesa_version=9331 # --> tested mesa_h5 output with
+#mesa_version=9331 # --> tested mesa_h5 output with
+mesa_version=10398 # --> latest tested version
 
 # probably nothing needs to be changed below here
 mesa_source_dir=$mesa_user_dir/mesa_$mesa_version
