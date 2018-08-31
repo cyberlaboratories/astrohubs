@@ -11,9 +11,9 @@
 mesa_user_dir=/user/mesa
 #mesa_version=7624 # --> Pavel (HB stars, RAWDs), Rob Farmer
 #mesa_version=7184 # --> Austin (massive stars)
-#mesa_version=8118 # --> Ondrea (Pop III)
+mesa_version=8118 # --> Ondrea (Pop III)
 #mesa_version=8845 # --> Jacqueline (rotating models, massive stars in the future)
-mesa_version=9331 # --> tested mesa_h5 output with
+#mesa_version=9331 # --> tested mesa_h5 output with
 #mesa_version=10398 # --> may have problems with -lz libaray, needs more testing
 
 # probably nothing needs to be changed below here
@@ -36,5 +36,12 @@ then
     ./install
     echo "MESA installation version $mesa_version complete in $mesa_source_dir"
 else
+    if [ -h $MESA_DIR ]
+    then
+	rm $MESA_DIR
+	ln -s $mesa_source_dir $MESA_DIR  # $MESA_DIR is defined in .bash_aliases
+    fi
+    
     echo "MESA version $mesa_version already installed in $mesa_source_dir."
+    echo "$MESA_DIR points to" $mesa_version
 fi
