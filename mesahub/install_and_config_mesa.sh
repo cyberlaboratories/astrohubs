@@ -8,7 +8,7 @@
 # 2018, Falk Herwig, UVic
 #
 # define some things
-mesa_user_dir=/user/mesa
+mesa_user_dir=/home/user/mesa
 #mesa_version=8118
 #mesa_version=8845
 mesa_version=9331
