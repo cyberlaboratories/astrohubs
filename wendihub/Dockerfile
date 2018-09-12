@@ -1,4 +1,5 @@
-FROM cyberhubs/corehub
+#FROM cyberhubs/corehub
+FROM local/corehub
 
 MAINTAINER Falk Herwig
 
@@ -58,7 +59,7 @@ COPY  secret/notebook_secret /home/user/.local/share/jupyter/notebook_secret
 COPY  nbconfig/notebook.json /usr/local/etc/jupyter/nbconfig/notebook.json
 COPY  custom /home/user/.jupyter/custom
 
-ENV PYTHONPATH /usr/local/bin/:/opt/WENDI/modules/:/opt/WENDI/modules_py3/:/opt/NuPyCEE/
+ENV PYTHONPATH /usr/local/bin/:/opt/WENDI/modules/:/opt/WENDI/modules_py3/:/opt/NuPyCEE/:/opt
 
 RUN chmod -R 775 /home/user/notebooks
 
@@ -70,6 +71,10 @@ RUN chown -R user:user /home/user && \
 COPY ./trusted_nb.sh /srv/singleuser/trusted_nb.sh
 RUN chmod +x /srv/singleuser/trusted_nb.sh
 
+
+RUN git clone https://github.com/becot85/JINAPyCEE.git /opt/JINAPyCEE && \
+    cd /opt/JINAPyCEE && python2 setup.py develop  && python3 setup.py develop 
+    
 USER user
 ENV HOME /home/user
 WORKDIR /home/user
