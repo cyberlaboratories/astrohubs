@@ -39,8 +39,6 @@ COPY ./source/mesa.tar.gz  /tmp/mesa.tar.gz
 
 RUN tar zxvf /tmp/mesa.tar.gz -C /tmp/
 
-COPY jupyterhub-singleuser /usr/local/bin/jupyterhub-singleuser
-
 COPY singleuser.sh /srv/singleuser/singleuser.sh
 
 RUN  chmod -R 775 /home/user/notebooks
