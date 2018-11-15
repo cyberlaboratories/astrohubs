@@ -8,7 +8,7 @@
 # 2018, Falk Herwig, UVic
 #
 # define some things
-mesa_user_dir=/home/user/mesa
+mesa_user_dir=/user/mesa
 #mesa_version=7624 # --> Pavel (HB stars, RAWDs), Rob Farmer
 #mesa_version=7184 # --> Austin (massive stars)
 mesa_version=8118 # --> Ondrea (Pop III)
