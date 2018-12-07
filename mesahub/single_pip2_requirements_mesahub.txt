@@ -1,4 +1,0 @@
-astropy==2.0.2
-scipy==0.19.1
-h5py==2.7.1
-nugridpy==0.7.4
