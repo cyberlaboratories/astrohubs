@@ -1,7 +1,12 @@
 alias ed="emacs -nw"
-alias ppm2png='(names=`ls *ppm`; for name in $names; do convert $name ${name:0:21}png; rm $name; done)'
 cedar() {
 	ssh -Y $1@cedar.computecanada.ca
+}
+niagara() {
+	ssh -Y $1@niagara.computecanada.ca
+}
+hermes() {
+	ssh -Y $1@hermes.westgrid.ca
 }
 bluewaters() {
 	ssh -Y  $1@h2ologin.ncsa.illinois.edu
