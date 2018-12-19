@@ -1,4 +1,1 @@
-subversion
-rsync
-libopenblas-dev
-imagemagick 
+gfortran
