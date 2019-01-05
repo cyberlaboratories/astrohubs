@@ -1,4 +1,7 @@
+alias ip='ipython --quick'
+export EDITOR='emacs -nw'
 alias ed="emacs -nw"
+
 cedar() {
 	ssh -Y $1@cedar.computecanada.ca
 }
@@ -19,4 +22,7 @@ aquila() {
 }
 frodo() {
 	ssh $1@frodo.lcse.umn.edu
+}
+helix() {
+	ssh $1@helix.phys.uvic.ca
 }
