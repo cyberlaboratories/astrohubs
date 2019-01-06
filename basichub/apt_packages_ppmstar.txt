@@ -1,0 +1,8 @@
+dvipng
+gfortran
+imagemagick 
+libopenblas-dev
+pandoc
+tmux
+texlive-xetex
+
