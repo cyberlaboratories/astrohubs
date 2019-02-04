@@ -1,0 +1,12 @@
+build-essential
+make
+perl
+zlib1g
+zlib1g-dev
+tcsh
+libx11-6
+libx11-dev
+binutils
+gcc
+gfortran
+g++
