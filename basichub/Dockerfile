@@ -1,4 +1,4 @@
-FROM cyberhubs/corehub:latest
+FROM local/corehub
 MAINTAINER Falk Herwig
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -19,15 +19,12 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN pip install --upgrade pip && \
-    pip2 install --upgrade pip && \
     pip3 install --upgrade pip 
 
 RUN echo "Installing Python packages..."
 
-ADD ./single_pip2_requirements_ppmstar.txt /tmp/requirements/single_pip2.txt
 ADD ./single_pip3_requirements_ppmstar.txt /tmp/requirements/single_pip3.txt
 
-RUN pip2 install -r /tmp/requirements/single_pip2.txt  
 RUN pip3 install -r /tmp/requirements/single_pip3.txt 
 
 COPY jupyterhub-singleuser /usr/local/bin/jupyterhub-singleuser

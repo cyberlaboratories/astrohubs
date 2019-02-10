@@ -1,4 +1,4 @@
 build: 
 #	docker build -t local/mesahub .
-	docker build -t local/omegaphi .
+	docker build -t local/etamu .
 
