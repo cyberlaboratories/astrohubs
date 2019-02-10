@@ -1,4 +1,4 @@
-FROM cyberhubs/corehub:latest
+FROM local/corehub
 MAINTAINER Falk Herwig
 
 ENV DEBIAN_FRONTEND noninteractive
