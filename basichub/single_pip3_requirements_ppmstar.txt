@@ -4,6 +4,7 @@ h5py
 healpy
 matplotlib
 mpmath
+nbdime 
 nugridpy
 numpy
 scipy

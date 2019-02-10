@@ -52,7 +52,7 @@ RUN chown -R user:user /home/user && \
     chmod 775 /usr/local/bin/jupyterhub-singleuser && \
     chmod 775 /srv/singleuser/singleuser.sh
 
-COPY ./source/mesa.tgz  /tmp/mesa.tgz
+COPY ./source/mesa.tar.gz  /tmp/mesa.tgz
 RUN tar zxvf /tmp/mesa.tgz -C /tmp/ &&\
     chmod 775 /tmp/mesa/mesa_utils_install.sh  &&\
     /tmp/mesa/mesa_utils_install.sh &&\
@@ -77,6 +77,6 @@ RUN (cd /home/user/notebooks;git clone https://github.com/NuGrid/wendi-examples.
 CMD ["/bin/bash", "/srv/singleuser/singleuser.sh"]
 
 COPY README_mesa.ipynb  /home/user/notebooks
-COPY README_wendi3.ipynb  /home/user/notebooks
 RUN ln -s /home/user/notebooks/README_mesa.ipynb /home/user &&\
-    ln -s /home/user/notebooks/README_wendi3.ipynb /home/user
+    ln -s /jupyterhub_config/wendi3/README_wendi3.ipynb /home/user &&\
+    ln -s /jupyterhub_config/wendi3/README_wendi3.ipynb /home/user/notebooks
