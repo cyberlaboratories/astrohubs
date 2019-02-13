@@ -27,6 +27,11 @@ ADD ./single_pip3_requirements_ppmstar.txt /tmp/requirements/single_pip3.txt
 
 RUN pip3 install -r /tmp/requirements/single_pip3.txt 
 
+RUN jupyter serverextension enable --py nbdime  && \
+    jupyter nbextension install --py nbdime && \
+    jupyter nbextension enable --py nbdime && \
+    jupyter labextension install nbdime-jupyterlab
+
 COPY jupyterhub-singleuser /usr/local/bin/jupyterhub-singleuser
 COPY singleuser.sh /srv/singleuser/singleuser.sh
 RUN  chmod -R 775 /home/user/notebooks

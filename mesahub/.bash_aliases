@@ -8,3 +8,4 @@ export PATH=$PATH:/opt/openmpi-3.0.0/bin
 
 alias ed="emacs -nw"
 alias ip="ipython --quick"
+alias git_log="git log --all --oneline --decorate --graph"

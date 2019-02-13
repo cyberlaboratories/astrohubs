@@ -5,3 +5,4 @@ libopenblas-dev
 pandoc
 tmux
 texlive-xetex
+texlive-bibtex-extra
