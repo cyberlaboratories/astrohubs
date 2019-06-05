@@ -1,4 +1,4 @@
-FROM local/basichub
+FROM cyberhubs/basichub
 MAINTAINER Falk Herwig
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -11,21 +11,6 @@ WORKDIR /root
 
 ENV HOME /root
 
-RUN pip install --upgrade pip && \
-    pip2 install --upgrade pip && \
-    pip3 install --upgrade pip 
-
-RUN echo "Installing Python packages ..."
-
-ADD ./single_pip2_requirements_ppmstar.txt /tmp/requirements/single_pip2.txt
-ADD ./single_pip3_requirements_ppmstar.txt /tmp/requirements/single_pip3.txt
-
-RUN pip2 install -r /tmp/requirements/single_pip2.txt  
-RUN pip3 install -r /tmp/requirements/single_pip3.txt 
-
-COPY jupyterhub-singleuser /usr/local/bin/jupyterhub-singleuser
-COPY singleuser.sh /srv/singleuser/singleuser.sh
-#RUN  chmod -R 775 /home/user/notebooks
 
 # moments and e3d stuff
 
@@ -38,20 +23,44 @@ RUN make -C /tmp/src_read_ppm gfort && \
     make -C /tmp/src_e3d gfort && \
     mv /tmp/src_e3d/e3d /bin/e3d
     
-RUN pip2 install --upgrade pip && \
-    pip2 install /tmp/moments.tar.gz && \
-    pip3 install --upgrade pip && \
+RUN pip3 install --upgrade pip && \
     pip3 install /tmp/moments.tar.gz && \
     rm -r /tmp/moments.tar.gz 
 
+
+RUN pip install --upgrade pip && \
+    pip3 install --upgrade pip 
+
+RUN echo "Installing Python packages ...8"
+
+ADD ./single_pip3_requirements_ppmstar.txt /tmp/requirements/single_pip3.txt
+
+RUN pip3 install -r /tmp/requirements/single_pip3.txt 
+
+COPY jupyterhub-singleuser /usr/local/bin/jupyterhub-singleuser
+COPY singleuser.sh /srv/singleuser/singleuser.sh
+#RUN  chmod -R 775 /home/user/notebooks
 
 COPY .bash_aliases /home/user
 RUN echo restart here
 COPY README_ppmstar.ipynb  /home/user/
 
-RUN echo "Loading PPMnotebooks git repo ... "
-RUN git clone https://github.com/PPMstar/PPMnotebooks.git /home/user/PPMnotebooks
+RUN echo "Loading PPMnotebooks git repo ... 3"
+RUN git clone --depth=1 https://github.com/PPMstar/PPMnotebooks.git /home/user/PPMnotebooks
+RUN cp /home/user/PPMnotebooks/Demos/rprofile-widget.ipynb /home/user
 
+RUN echo "Install new aptget 2"
+COPY apt_packages_ppmstar.txt   /tmp/apt.txt
+RUN apt-get update && \
+    apt-get -y install $(cat /tmp/apt.txt) && \
+    apt-get autoremove --yes && apt-get clean all && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN cd /tmp && \
+    git clone https://github.com/SHTOOLS/SHTOOLS.git && \
+    cd SHTOOLS && \
+    pip install .
+
+RUN pip install git+https://github.com/NuGrid/NuGridPy.git
 RUN chown -R user:user /home/user && \
     chmod -R 775 /home/user/ && \
     chmod 775 /usr/local/bin/jupyterhub-singleuser && \

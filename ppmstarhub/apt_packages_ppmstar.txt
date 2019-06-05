@@ -1,1 +1,7 @@
-gfortran
+mencoder
+libblas-dev 
+liblapack-dev 
+g++ 
+gfortran 
+libfftw3-dev 
+tcsh
