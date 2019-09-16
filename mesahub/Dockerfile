@@ -44,6 +44,7 @@ RUN echo Installed nuse ..........
 COPY singleuser.sh /srv/singleuser/singleuser.sh
 RUN  chmod -R 775 /home/user/notebooks
 
+RUN echo Restart from here 1
 COPY .bash_aliases /tmp
 RUN cat /tmp/.bash_aliases >> /home/user/.bash_aliases
 
@@ -63,6 +64,10 @@ RUN git clone https://github.com/NuGrid/NuPyCEE.git /opt/NuPyCEE && \
     cd /opt/JINAPyCEE && python2 setup.py develop  && python3 setup.py develop
 ENV PYTHONPATH /usr/local/bin/:/opt/NuPyCEE/:/opt
 
+RUN echo "Install again from here ... 7"
+#RUN pip install git+https://github.com/NuGrid/NuGridPy.git
+RUN pip install git+git://github.com/NuGrid/NuGridPy.git@0.7.6
+
 USER user:user
 ENV HOME /home/user
 WORKDIR /home/user
@@ -71,12 +76,10 @@ COPY mesasdk-x86_64-linux-20180822.tar.gz /home/user/
 RUN tar xvfz /home/user/mesasdk-x86_64-linux-20180822.tar.gz -C /home/user
 RUN rm -f /home/user/mesasdk-x86_64-linux-20180822.tar.gz
 
-RUN (cd /home/user/notebooks;git clone https://github.com/NuGrid/wendi-examples.git;\
-     ln -s /home/user/notebooks/wendi-examples /home/user)
+RUN (cd /home/user; git clone https://github.com/NuGrid/wendi-examples.git)
 
 CMD ["/bin/bash", "/srv/singleuser/singleuser.sh"]
 
 COPY README_mesa.ipynb  /home/user/notebooks
 RUN ln -s /home/user/notebooks/README_mesa.ipynb /home/user &&\
-    ln -s /jupyterhub_config/wendi3/README_wendi3.ipynb /home/user &&\
-    ln -s /jupyterhub_config/wendi3/README_wendi3.ipynb /home/user/notebooks
+    ln -s /jupyterhub_config/README_wendi3.ipynb /home/user
