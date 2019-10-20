@@ -1,1 +1,3 @@
 git+https://github.com/PPMstar/PyPPM
+git+https://github.com/SHTOOLS/SHTOOLS.git@v4.4
+git+https://github.com/NuGrid/NuGridPy.git
