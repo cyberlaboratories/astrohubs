@@ -28,5 +28,5 @@ requests==2.18.4
 scipy==0.19.1
 seaborn==0.8.1
 sympy==1.1.1
-urllib3==1.22
+urllib3==1.24.2
 Werkzeug==0.12.2
