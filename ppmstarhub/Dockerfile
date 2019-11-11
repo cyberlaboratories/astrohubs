@@ -1,4 +1,5 @@
-FROM cyberhubs/basichub
+FROM cyberhubs/basichub:1.2.4
+
 MAINTAINER Falk Herwig
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -30,13 +31,12 @@ RUN pip install --upgrade pip && \
 
 COPY jupyterhub-singleuser /usr/local/bin/jupyterhub-singleuser
 COPY singleuser.sh /srv/singleuser/singleuser.sh
-#RUN  chmod -R 775 /home/user/notebooks
 
 COPY .bash_aliases /home/user
 RUN echo restart here
 COPY README_ppmstar.ipynb  /home/user/
 
-RUN echo "Loading PPMnotebooks git repo ... 3"
+RUN echo "Loading PPMnotebooks git repo ... 1"
 RUN git clone --depth=1 https://github.com/PPMstar/PPMnotebooks.git /home/user/PPMnotebooks
 RUN cp /home/user/PPMnotebooks/Demos/rprofile-widget.ipynb /home/user
 
@@ -47,7 +47,7 @@ RUN apt-get update && \
     apt-get autoremove --yes && apt-get clean all && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN echo "Installing Python packages ...1"
+RUN echo "Installing Python packages ... 1"
 ADD ./single_pip3_requirements_ppmstar.txt /tmp/requirements/single_pip3.txt
 RUN pip3 install -r /tmp/requirements/single_pip3.txt 
 

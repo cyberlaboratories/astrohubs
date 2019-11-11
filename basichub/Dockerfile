@@ -1,4 +1,4 @@
-FROM local/corehub
+FROM cyberhubs/corehub:1.2.4
 MAINTAINER Falk Herwig
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -34,7 +34,6 @@ RUN jupyter serverextension enable --py nbdime  && \
 
 COPY jupyterhub-singleuser /usr/local/bin/jupyterhub-singleuser
 COPY singleuser.sh /srv/singleuser/singleuser.sh
-RUN  chmod -R 775 /home/user/notebooks
 
 RUN chown -R user:user /home/user && \
     chmod -R 775 /home/user/ && \
@@ -47,7 +46,5 @@ WORKDIR /home/user
 
 CMD ["/bin/bash", "/srv/singleuser/singleuser.sh"]
 
-RUN ln -s /user /home/user/notebooks
 RUN ln -s /user /home/user
-RUN ln -s /data /home/user/notebooks
 RUN ln -s /data /home/user

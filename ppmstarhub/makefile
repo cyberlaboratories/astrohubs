@@ -1,4 +1,9 @@
 build: 
 	docker build -t local/ppmstarhub .
-#	docker build -t local/alphatheta .
-#	docker build -t local/etamu .
+
+nocache:
+	docker build --no-cache -t local/ppmstarhub .
+
+release:
+	docker build -t cyberhubs/ppmstarhub:1.2.4 .
+
