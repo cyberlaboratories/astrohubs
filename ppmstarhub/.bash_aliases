@@ -1,4 +1,4 @@
-epxort PS1='\[\e]2;\W\a\]${PWD#"${PWD%/*/*}/"}\$ '
+export PS1='\[\e]2;\W\a\]${PWD#"${PWD%/*/*}/"}\$ '
 export EDITOR='emacs -nw'
 
 cedar() {
