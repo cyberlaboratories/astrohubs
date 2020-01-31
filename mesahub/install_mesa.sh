@@ -11,10 +11,11 @@
 mesa_user_dir=/user/mesa
 #mesa_version=7624 # --> Pavel (HB stars, RAWDs), Rob Farmer
 #mesa_version=7184 # --> Austin (massive stars)
-mesa_version=8118 # --> Ondrea (Pop III)
+#mesa_version=8118 # --> Ondrea (Pop III)
 #mesa_version=8845 # --> Jacqueline (rotating models, massive stars in the future)
 #mesa_version=9331 # --> tested mesa_h5 output with
 #mesa_version=10398 
+mesa_version=12115 # --> Brad RCB stars
 # note: there may be some cyberhub images still around that have problems with -lz libaray, please report to fherwig@uvic.ca
 
 # probably nothing needs to be changed below here
@@ -23,7 +24,12 @@ mesa_source_dir=$mesa_user_dir/mesa_$mesa_version
 if [ ! -d $mesa_source_dir ] 
 then
     echo Installing into $mesa_user_dir
-    svn co -r $mesa_version svn://svn.code.sf.net/p/mesa/code/trunk $mesa_source_dir
+    if [ $mesa_version -lt 12115 ]
+    then
+        svn co -r $mesa_version svn://svn.code.sf.net/p/mesa/code/trunk $mesa_source_dir
+    else
+        svn co -r $mesa_version https://subversion.assembla.com/svn/mesa^mesa/trunk $mesa_source_dir
+    fi
     ln -s $mesa_source_dir $MESA_DIR  # $MESA_DIR is defined in .bash_aliases
     cd $mesa_source_dir/utils
     sed -i s/"USE_PGSTAR = YES"/"USE_PGSTAR = NO"/g makefile_header
