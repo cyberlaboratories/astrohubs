@@ -14,8 +14,8 @@ mesa_user_dir=/user/mesa
 #mesa_version=8118 # --> Ondrea (Pop III)
 #mesa_version=8845 # --> Jacqueline (rotating models, massive stars in the future)
 #mesa_version=9331 # --> tested mesa_h5 output with
-#mesa_version=10398 
-mesa_version=12115 # --> Brad RCB stars
+mesa_version=10398 
+#mesa_version=12115 # --> Brad RCB stars
 # note: there may be some cyberhub images still around that have problems with -lz libaray, please report to fherwig@uvic.ca
 
 # probably nothing needs to be changed below here
