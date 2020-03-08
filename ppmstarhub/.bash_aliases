@@ -1,8 +1,11 @@
-epxort PS1='\[\e]2;\W\a\]${PWD#"${PWD%/*/*}/"}\$ '
+export PS1='\[\e]2;\W\a\]${PWD#"${PWD%/*/*}/"}\$ '
 export EDITOR='emacs -nw'
 
 cedar() {
         ssh -Y $1@cedar.computecanada.ca
+}
+frontera() {
+        ssh ssh -Y $1@frontera.tacc.utexas.edu
 }
 niagara() {
         ssh -Y $1@niagara.computecanada.ca
@@ -32,3 +35,4 @@ alias ip='ipython --quick'
 alias ed="emacs -nw"
 alias ec="emacsclient"
 
+alias git_log='git log --all --oneline --decorate --graph'
