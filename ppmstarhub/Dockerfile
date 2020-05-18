@@ -1,4 +1,4 @@
-FROM cyberhubs/basichub:1.2.4
+FROM cyberhubs/basichub:1.2.5
 
 MAINTAINER Falk Herwig
 
@@ -40,7 +40,7 @@ RUN echo "Loading PPMnotebooks git repo ... 1"
 RUN git clone --depth=1 https://github.com/PPMstar/PPMnotebooks.git /home/user/PPMnotebooks
 RUN cp /home/user/PPMnotebooks/Demos/rprofile-widget.ipynb /home/user
 
-RUN echo "Install new aptget 3"
+RUN echo "Install new aptget 1"
 COPY apt_packages_ppmstar.txt   /tmp/apt.txt
 RUN apt-get update && \
     apt-get -y install $(cat /tmp/apt.txt) && \

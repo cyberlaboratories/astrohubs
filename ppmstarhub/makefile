@@ -5,5 +5,5 @@ nocache:
 	docker build --no-cache -t local/ppmstarhub .
 
 release:
-	docker build -t cyberhubs/ppmstarhub:1.2.4 .
+	docker build -t cyberhubs/ppmstarhub:1.2.6 .
 

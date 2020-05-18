@@ -4,5 +4,7 @@ imagemagick
 libopenblas-dev
 pandoc
 tmux
+texlive-full
+texlive-science
 texlive-xetex
 texlive-bibtex-extra

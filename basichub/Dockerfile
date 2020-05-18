@@ -11,6 +11,8 @@ WORKDIR /root
 
 ENV HOME /root
 
+RUN echo "Installing Ubuntu apt-get packages..."
+
 COPY apt_packages.txt   /tmp/apt.txt
 
 RUN apt-get update && \
