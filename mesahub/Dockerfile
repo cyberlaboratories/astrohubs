@@ -1,4 +1,4 @@
-FROM cyberhubs/basichub:1.2.4
+FROM cyberhubs/basichub:1.2.6
 
 MAINTAINER Falk Herwig
 
@@ -42,9 +42,8 @@ RUN ([ ! -d /opt/se-1.2 ] && (cd /tmp; \
 RUN echo Installed nuse ..........
 
 COPY singleuser.sh /srv/singleuser/singleuser.sh
-RUN  chmod -R 775 /home/user/notebooks
 
-RUN echo Restart from here 1
+RUN echo Install .bash_aliases
 COPY .bash_aliases /tmp
 RUN cat /tmp/.bash_aliases >> /home/user/.bash_aliases
 
@@ -64,10 +63,11 @@ RUN git clone https://github.com/NuGrid/NuPyCEE.git /opt/NuPyCEE && \
     cd /opt/JINAPyCEE && python2 setup.py develop  && python3 setup.py develop
 ENV PYTHONPATH /usr/local/bin/:/opt/NuPyCEE/:/opt
 
-RUN echo "Install again from here ... 0"
+RUN echo "Install again from here ... "
 #RUN pip install git+https://github.com/NuGrid/NuGridPy.git
 #RUN pip install git+git://github.com/NuGrid/NuGridPy.git@1f21ffa33139cc24e0a76d16ecbe500bc703ac95 # old master
-RUN pip install git+git://github.com/NuGrid/NuGridPy.git@with-broken-preprocessing
+#RUN pip install git+git://github.com/NuGrid/NuGridPy.git@with-broken-preprocessing
+RUN pip install git+https://github.com/NuGrid/NuGridPy.git@0.7.6
 
 USER user:user
 ENV HOME /home/user
