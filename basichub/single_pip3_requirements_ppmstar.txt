@@ -1,12 +1,13 @@
 astropy
 folium
+globus-cli
 h5py
 healpy
 matplotlib
 mpmath
 nbdime 
-nugridpy
 numpy
+pandas
 scipy
 seaborn
 tables

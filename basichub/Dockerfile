@@ -23,7 +23,7 @@ RUN apt-get update && \
 RUN pip install --upgrade pip && \
     pip3 install --upgrade pip 
 
-RUN echo "Installing Python packages..."
+RUN echo "Installing Python packages ... "
 
 ADD ./single_pip3_requirements_ppmstar.txt /tmp/requirements/single_pip3.txt
 
@@ -41,6 +41,8 @@ RUN chown -R user:user /home/user && \
     chmod -R 775 /home/user/ && \
     chmod 775 /usr/local/bin/jupyterhub-singleuser && \
     chmod 775 /srv/singleuser/singleuser.sh
+# this switches default python at command line to python 3
+RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 10
 
 USER user
 ENV HOME /home/user
