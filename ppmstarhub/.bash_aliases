@@ -37,13 +37,11 @@ alias ec="emacsclient"
 
 alias git_log='git log --all --oneline --decorate --graph'
 
-# needed for globus-cli
-export LC_ALL=C.UTF-8
-export LANG=C.UTF-8
-
-echo Function globus_help provides help for Globus CLI
+echo Function globus_help provides help for Globus CLI and sets required ENV variable. Use once before using globus command.
 
 globus_help(){
+    export LC_ALL=C.UTF-8
+    export LANG=C.UTF-8
     echo ""
     echo Quickstart: https://docs.globus.org/cli/quickstart
     echo ""
