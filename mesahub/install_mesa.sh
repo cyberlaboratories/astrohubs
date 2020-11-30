@@ -9,14 +9,14 @@
 #
 # define some things
 mesa_user_dir=/user/mesa
-#mesa_version=5329 # --> Pavel (90Msun and supermassive stars)
-#mesa_version=7624 # --> Pavel (HB stars, RAWDs), Rob Farmer
-#mesa_version=7184 # --> Austin (massive stars)
-#mesa_version=8118 # --> Ondrea (Pop III)
-#mesa_version=8845 # --> Jacqueline (rotating models, massive stars)
-#mesa_version=9331 # --> tested mesa_h5 output with
-mesa_version=10398 
-#mesa_version=12115 # --> Brad RCB stars
+# mesa_version=5329 # --> Pavel (90Msun and supermassive stars)
+# mesa_version=7624 # --> Pavel (HB stars, RAWDs), Rob Farmer
+# mesa_version=7184 # --> Austin (massive stars)
+# mesa_version=8118 # --> Ondrea (Pop III)  
+# mesa_version=8845 # --> Jacqueline (rotating models, massive stars)
+# mesa_version=9331 # --> tested mesa_h5 output with
+# mesa_version=10398 
+mesa_version=12115 # --> Brad RCB stars
 # note: there may be some cyberhub images still around that have problems with -lz libaray, please report to fherwig@uvic.ca
 
 # probably nothing needs to be changed below here
@@ -42,12 +42,12 @@ then
     cd $mesa_source_dir/utils
     sed -i s/"USE_PGSTAR = YES"/"USE_PGSTAR = NO"/g makefile_header
     sed -i /"LOAD_PGPLOT ="/c\ "LOAD_PGPLOT =" makefile_header
-    if [[ $mesa_version =~ ^7 ]] || [[ $mesa_version =~ ^5 ]]
+    if [[ $mesa_version =~ ^7 ]] || [[ $mesa_version =~ ^5 ]] || [[ $mesa_version =~ ^8 ]] 
     then
         sed -i '/FCbasic = -fno-range-check/s/$/ -Wno-uninitialized/' makefile_header
     fi
     cd ..
-    if [[ $mesa_version =~ ^5 ]]
+    if [[ $mesa_version =~ ^5 ]]  
     then
 	cd star/private
 	sed -i s/"stop'fixup'"/"stop 'fixup'"/g mod_diffusion_procs.f
@@ -55,7 +55,13 @@ then
 	sed -i s/"call do_pgstar_plots"/"\!call do_pgstar_plots"/g star_lib.f
 	cd ../..
     fi
-    if [[ $mesa_version =~ ^7 ]] 
+    if [[ $mesa_version == 7184 ]]
+    then
+	cd star/private
+	sed -i s/"stop'fixup'"/"stop 'fixup'"/g mod_diffusion_procs.f
+	cd ../..
+    fi
+    if [[ $mesa_version =~ ^9 ]] || [[ $mesa_version =~ ^8 ]] || [[ $mesa_version == 7624 ]]
     then
 	cd star/private
 	sed -i s/"stop'fixup'"/"stop 'fixup'"/g diffusion_procs.f90
