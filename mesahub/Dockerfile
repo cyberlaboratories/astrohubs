@@ -68,7 +68,9 @@ RUN echo "Install again from here ... "
 #RUN pip install git+git://github.com/NuGrid/NuGridPy.git@1f21ffa33139cc24e0a76d16ecbe500bc703ac95 # old master
 #RUN pip install git+git://github.com/NuGrid/NuGridPy.git@with-broken-preprocessing
 #RUN pip install git+https://github.com/NuGrid/NuGridPy.git@0.7.6
-RUN pip install git+https://github.com/NuGrid/NuGridPy.git@0.8-beta1
+#RUN pip install git+https://github.com/NuGrid/NuGridPy.git@0.8-beta1 fix-mesa-new-history
+COPY NuGridPy-fix-mesa-new-history.zip /tmp/NuGridPy-fix-mesa-new-history.zip
+RUN pip install /tmp/NuGridPy-fix-mesa-new-history.zip
 RUN pip install iniabu
 
 USER user:user
@@ -79,11 +81,13 @@ COPY mesasdk-x86_64-linux-20180822.tar.gz /home/user/
 RUN tar xvfz /home/user/mesasdk-x86_64-linux-20180822.tar.gz -C /home/user
 RUN rm -f /home/user/mesasdk-x86_64-linux-20180822.tar.gz
 
+RUN echo "Install again from here ... 1 "
 RUN (cd /home/user; git clone https://github.com/NuGrid/wendi-examples.git)
 COPY jupyter-config.tar /home/user/jupyter-config.tar
 RUN (tar xvf jupyter-config.tar; rm -f  jupyter-config.tar) 
 
 CMD ["/bin/bash", "/srv/singleuser/singleuser.sh"]
 
-COPY README_mesa.ipynb  /home/user
+#COPY README_mesa.ipynb  /home/user
+RUN ln -s "/home/user/wendi-examples/Stellar evolution and nucleosynthesis data/Install_Run_Analyze_MESA.ipynb" /home/user 
 RUN ln -s /jupyterhub_config/README_wendi3.ipynb /home/user
