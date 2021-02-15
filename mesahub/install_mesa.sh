@@ -5,7 +5,9 @@
 # 1: installation location (defaults to /user/mesa)
 # 2: mesa version (defaults 9331)
 #
-# 2018, Falk Herwig, UVic
+# This script has been tested on the mesahub application v1.2.6
+# 
+# 2018-2021, Falk Herwig, UVic
 #
 # define some things
 mesa_user_dir=/user/mesa
@@ -15,9 +17,9 @@ mesa_user_dir=/user/mesa
 # mesa_version=8118 # --> Ondrea (Pop III)  
 # mesa_version=8845 # --> Jacqueline (rotating models, massive stars)
 # mesa_version=9331 # --> tested mesa_h5 output with
-# mesa_version=10398 
-mesa_version=12115 # --> Brad RCB stars
-# note: there may be some cyberhub images still around that have problems with -lz libaray, please report to fherwig@uvic.ca
+mesa_version=10398 
+# mesa_version=12115 # --> Brad RCB stars
+
 
 # probably nothing needs to be changed below here
 mesa_source_dir=$mesa_user_dir/mesa_$mesa_version
