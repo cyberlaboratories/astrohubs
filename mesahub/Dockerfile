@@ -43,7 +43,7 @@ RUN echo Installed nuse ..........
 
 COPY singleuser.sh /srv/singleuser/singleuser.sh
 
-RUN echo Install .bash_aliases
+RUN echo Install .bash_aliases 1
 COPY .bash_aliases /tmp
 RUN cat /tmp/.bash_aliases >> /home/user/.bash_aliases
 
@@ -67,7 +67,9 @@ RUN echo "Install again from here ... "
 #RUN pip install git+https://github.com/NuGrid/NuGridPy.git
 #RUN pip install git+git://github.com/NuGrid/NuGridPy.git@1f21ffa33139cc24e0a76d16ecbe500bc703ac95 # old master
 #RUN pip install git+git://github.com/NuGrid/NuGridPy.git@with-broken-preprocessing
-RUN pip install git+https://github.com/NuGrid/NuGridPy.git@0.7.6
+#RUN pip install git+https://github.com/NuGrid/NuGridPy.git@0.7.6
+RUN pip install git+https://github.com/NuGrid/NuGridPy.git@0.8-beta1
+RUN pip install iniabu
 
 USER user:user
 ENV HOME /home/user
@@ -78,6 +80,8 @@ RUN tar xvfz /home/user/mesasdk-x86_64-linux-20180822.tar.gz -C /home/user
 RUN rm -f /home/user/mesasdk-x86_64-linux-20180822.tar.gz
 
 RUN (cd /home/user; git clone https://github.com/NuGrid/wendi-examples.git)
+COPY jupyter-config.tar /home/user/jupyter-config.tar
+RUN (tar xvf jupyter-config.tar; rm -f  jupyter-config.tar) 
 
 CMD ["/bin/bash", "/srv/singleuser/singleuser.sh"]
 
