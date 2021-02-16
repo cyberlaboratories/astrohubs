@@ -36,7 +36,7 @@ RUN echo "Loading PPMnotebooks git repo ... "
 RUN git clone --depth=1 https://github.com/PPMstar/PPMnotebooks.git /home/user/PPMnotebooks
 RUN cp /home/user/PPMnotebooks/Demos/RProf_gui.ipynb /home/user
 
-RUN echo "Install new aptget 1"
+RUN echo "Install new aptget ..."
 COPY apt_packages_ppmstar.txt   /tmp/apt.txt
 RUN apt-get update && \
     apt-get -y install $(cat /tmp/apt.txt) && \
@@ -47,7 +47,7 @@ RUN echo "Installing Python packages ... "
 ADD ./single_pip3_requirements_ppmstar.txt /tmp/requirements/single_pip3.txt
 RUN pip3 install -r /tmp/requirements/single_pip3.txt 
 
-RUN echo Restart here again
+RUN echo Restart here again ...
 COPY .bash_aliases /home/user
 
 RUN chown -R user:user /home/user && \
@@ -61,6 +61,10 @@ WORKDIR /home/user
 
 CMD ["/bin/bash", "/srv/singleuser/singleuser.sh"]
 RUN echo link README_ppnstar.ipynb
+
+COPY jupyter-config.tar /home/user/jupyter-config.tar
+RUN (tar xvf jupyter-config.tar; rm -f  jupyter-config.tar) 
+
 #RUN ln -s /jupyterhub_config/README_ppmstar.ipynb /home/user
 COPY README_ppmstar.ipynb  /home/user/
 
