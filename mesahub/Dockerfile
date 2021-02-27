@@ -1,6 +1,7 @@
 FROM cyberhubs/basichub:1.2.6
 
-MAINTAINER Falk Herwig
+LABEL maintainer="Falk Herwig fherwig@uvic.ca"
+
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -69,9 +70,14 @@ RUN echo "Install again from here ... "
 #RUN pip install git+git://github.com/NuGrid/NuGridPy.git@with-broken-preprocessing
 #RUN pip install git+https://github.com/NuGrid/NuGridPy.git@0.7.6
 #RUN pip install git+https://github.com/NuGrid/NuGridPy.git@0.8-beta1 fix-mesa-new-history
+# this is the somewhat latest (feb 2021) version of NuGridPy from the
+# GitLab server that does not allow public installs and I have not figured 
+# out how to add a password
 COPY NuGridPy-fix-mesa-new-history.zip /tmp/NuGridPy-fix-mesa-new-history.zip
 RUN pip install /tmp/NuGridPy-fix-mesa-new-history.zip
 RUN pip install iniabu
+
+
 
 USER user:user
 ENV HOME /home/user
@@ -81,13 +87,15 @@ COPY mesasdk-x86_64-linux-20180822.tar.gz /home/user/
 RUN tar xvfz /home/user/mesasdk-x86_64-linux-20180822.tar.gz -C /home/user
 RUN rm -f /home/user/mesasdk-x86_64-linux-20180822.tar.gz
 
-RUN echo "Install again from here ... 1 "
-RUN (cd /home/user; git clone https://github.com/NuGrid/wendi-examples.git)
+RUN echo "Install again from here ... 2 "
+#RUN (cd /home/user; git clone https://github.com/NuGrid/wendi-examples.git)
 COPY jupyter-config.tar /home/user/jupyter-config.tar
 RUN (tar xvf jupyter-config.tar; rm -f  jupyter-config.tar) 
 
 CMD ["/bin/bash", "/srv/singleuser/singleuser.sh"]
 
 #COPY README_mesa.ipynb  /home/user
-RUN ln -s "/home/user/wendi-examples/Stellar evolution and nucleosynthesis data/Install_Run_Analyze_MESA.ipynb" /home/user 
-RUN ln -s /jupyterhub_config/README_wendi3.ipynb /home/user
+#RUN ln -s "/home/user/wendi-examples/Stellar evolution and nucleosynthesis data/Install_Run_Analyze_MESA.ipynb" /home/user 
+#RUN ln -s /jupyterhub_config/README_wendi3.ipynb /home/user
+RUN ln -s /jupyterhub_config/Readme.md /home/user
+RUN ln -s /user ~/Network-school
