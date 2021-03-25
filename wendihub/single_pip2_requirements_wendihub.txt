@@ -23,7 +23,7 @@ Pillow==4.2.1
 protobuf==3.4.0
 py==1.4.34
 pytest==3.2.2
-PyYAML==3.12
+PyYAML==5.4
 requests==2.18.4
 scipy==0.19.1
 seaborn==0.8.1
