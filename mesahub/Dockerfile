@@ -81,7 +81,7 @@ COPY mesasdk-x86_64-linux-20180822.tar.gz /home/user/
 RUN tar xvfz /home/user/mesasdk-x86_64-linux-20180822.tar.gz -C /home/user
 RUN rm -f /home/user/mesasdk-x86_64-linux-20180822.tar.gz
 
-RUN echo "Install again from here ... 1 "
+RUN echo "Install again from here ... 2 "
 RUN (cd /home/user; git clone https://github.com/NuGrid/wendi-examples.git)
 COPY jupyter-config.tar /home/user/jupyter-config.tar
 RUN (tar xvf jupyter-config.tar; rm -f  jupyter-config.tar) 
@@ -90,4 +90,5 @@ CMD ["/bin/bash", "/srv/singleuser/singleuser.sh"]
 
 #COPY README_mesa.ipynb  /home/user
 RUN ln -s "/home/user/wendi-examples/Stellar evolution and nucleosynthesis data/Install_Run_Analyze_MESA.ipynb" /home/user 
-RUN ln -s /jupyterhub_config/README_wendi3.ipynb /home/user
+RUN ln -s "/home/user/wendi-examples/Stellar evolution and nucleosynthesis data/Star_explore.ipynb" /home/user 
+RUN ln -s /jupyterhub_config/README_wendi.md /home/user
