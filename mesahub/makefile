@@ -1,5 +1,5 @@
 build: 
-#	docker build -t local/mesahub .
-#	docker build -t local/etamu .
+	docker build -t cyberhubs/mesahub:tina .
+local: 
 	docker build -t local/etamu:tina .
 

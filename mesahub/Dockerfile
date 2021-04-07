@@ -1,4 +1,4 @@
-FROM cyberhubs/basichub:1.2.6
+FROM local/basichub:tina
 
 LABEL maintainer="Falk Herwig fherwig@uvic.ca"
 
@@ -53,12 +53,6 @@ RUN chown -R user:user /home/user && \
     chmod 775 /usr/local/bin/jupyterhub-singleuser && \
     chmod 775 /srv/singleuser/singleuser.sh
 
-COPY ./source/mesa.tar.gz  /tmp/mesa.tgz
-RUN tar zxvf /tmp/mesa.tgz -C /tmp/ &&\
-    chmod 775 /tmp/mesa/mesa_utils_install.sh  &&\
-    /tmp/mesa/mesa_utils_install.sh &&\
-    rm -rf /tmp/mesa*
-
 RUN git clone https://github.com/NuGrid/NuPyCEE.git /opt/NuPyCEE && \
     git clone https://github.com/becot85/JINAPyCEE.git /opt/JINAPyCEE && \
     cd /opt/JINAPyCEE && python2 setup.py develop  && python3 setup.py develop
@@ -77,15 +71,20 @@ COPY NuGridPy-fix-mesa-new-history.zip /tmp/NuGridPy-fix-mesa-new-history.zip
 RUN pip install /tmp/NuGridPy-fix-mesa-new-history.zip
 RUN pip install iniabu
 
+# COPY ./source/mesa.tar.gz  /tmp/mesa.tgz
+# RUN tar zxvf /tmp/mesa.tgz -C /tmp/ &&\
+#     chmod 775 /tmp/mesa/mesa_utils_install.sh  &&\
+#     /tmp/mesa/mesa_utils_install.sh &&\
+#     rm -rf /tmp/mesa*
 
 
 USER user:user
 ENV HOME /home/user
 WORKDIR /home/user
 
-COPY mesasdk-x86_64-linux-20180822.tar.gz /home/user/
-RUN tar xvfz /home/user/mesasdk-x86_64-linux-20180822.tar.gz -C /home/user
-RUN rm -f /home/user/mesasdk-x86_64-linux-20180822.tar.gz
+# COPY mesasdk-x86_64-linux-20180822.tar.gz /home/user/
+# RUN tar xvfz /home/user/mesasdk-x86_64-linux-20180822.tar.gz -C /home/user
+# RUN rm -f /home/user/mesasdk-x86_64-linux-20180822.tar.gz
 
 RUN echo "Install again from here ... 2 "
 #RUN (cd /home/user; git clone https://github.com/NuGrid/wendi-examples.git)
