@@ -32,10 +32,6 @@ RUN pip install --upgrade pip && \
 COPY jupyterhub-singleuser /usr/local/bin/jupyterhub-singleuser
 COPY singleuser.sh /srv/singleuser/singleuser.sh
 
-RUN echo "Loading PPMnotebooks git repo ... "
-RUN git clone --depth=1 https://github.com/PPMstar/PPMnotebooks.git /home/user/PPMnotebooks
-RUN cp /home/user/PPMnotebooks/Demos/RProf_gui.ipynb /home/user
-
 RUN echo "Install new aptget ..."
 COPY apt_packages_ppmstar.txt   /tmp/apt.txt
 RUN apt-get update && \
@@ -43,12 +39,15 @@ RUN apt-get update && \
     apt-get autoremove --yes && apt-get clean all && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN echo "Installing Python packages ... "
+RUN echo "Installing Python packages ... 1 "
 ADD ./single_pip3_requirements_ppmstar.txt /tmp/requirements/single_pip3.txt
 RUN pip3 install -r /tmp/requirements/single_pip3.txt 
 
 RUN echo Restart here again ...
 COPY .bash_aliases /home/user
+
+RUN echo "Loading PPMnotebooks git repo ... 2"
+RUN git clone --depth=1 https://github.com/PPMstar/PPMnotebooks.git /home/user/PPMnotebooks
 
 RUN chown -R user:user /home/user && \
     chmod -R 775 /home/user/ && \
@@ -60,12 +59,11 @@ ENV HOME /home/user
 WORKDIR /home/user
 
 CMD ["/bin/bash", "/srv/singleuser/singleuser.sh"]
-RUN echo link README_ppnstar.ipynb
 
 COPY jupyter-config.tar /home/user/jupyter-config.tar
 RUN (tar xvf jupyter-config.tar; rm -f  jupyter-config.tar) 
 
-#RUN ln -s /jupyterhub_config/README_ppmstar.ipynb /home/user
-COPY README_ppmstar.ipynb  /home/user/
+RUN ln -s /jupyterhub_config/Readme.md /home/user
+RUN ln -s /home/user/PPMnotebooks/Demos/RProf-widget.ipynb  /home/user 
 
 

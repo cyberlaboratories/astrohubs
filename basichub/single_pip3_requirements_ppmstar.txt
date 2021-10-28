@@ -1,6 +1,7 @@
 astropy
 folium
 globus-cli
+gnureadline
 h5py
 healpy
 matplotlib
@@ -8,6 +9,7 @@ mpmath
 nbdime 
 numpy
 pandas
+python-openstackclient
 scipy
 seaborn
 tables
