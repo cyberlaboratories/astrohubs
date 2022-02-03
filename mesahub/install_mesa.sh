@@ -7,7 +7,7 @@
 #
 # This script has been tested on the mesahub application v1.2.6
 # 
-# 2018-2021, Falk Herwig, UVic
+# 2018-2022, Falk Herwig, UVic
 #
 # define some things
 mesa_user_dir=/user/mesa
@@ -16,9 +16,10 @@ mesa_user_dir=/user/mesa
 # mesa_version=7184 # --> Austin (massive stars)
 # mesa_version=8118 # --> Ondrea (Pop III)  
 # mesa_version=8845 # --> Jacqueline (rotating models, massive stars)
-# mesa_version=9331 # --> tested mesa_h5 output with
-mesa_version=10398 
+mesa_version=9331 # --> tested mesa_h5 output with
+# mesa_version=10398 
 # mesa_version=12115 # --> Brad RCB stars
+# mesa_version=15140 # --> RCB Brad paper II
 
 
 # probably nothing needs to be changed below here
@@ -30,6 +31,13 @@ then
     if [ $mesa_version -lt 12115 ]
     then
         svn co -r $mesa_version svn://svn.code.sf.net/p/mesa/code/trunk $mesa_source_dir
+    elif [[ $mesa_version == 15140 ]]
+        cd $mesa_user_dir
+        wget https://zenodo.org/record/4311514/files/mesa-r15140.zip
+        unzip mesa-r15140.zip
+        rm mesa-r15140.zip
+        mv mesa-r15140 mesa_$mesa_version
+        cd mesa_$mesa_version
     else
         svn co -r $mesa_version https://subversion.assembla.com/svn/mesa^mesa/trunk $mesa_source_dir
     fi
@@ -68,6 +76,10 @@ then
 	cd star/private
 	sed -i s/"stop'fixup'"/"stop 'fixup'"/g diffusion_procs.f90
 	cd ../..
+    fi
+    if [[ $mesa_version == 15140 ]]
+    then
+    echo MESA version 15140
     fi
     ./clean
     ./install
