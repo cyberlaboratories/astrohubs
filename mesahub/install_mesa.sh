@@ -16,10 +16,10 @@ mesa_user_dir=/user/mesa
 # mesa_version=7184 # --> Austin (massive stars)
 # mesa_version=8118 # --> Ondrea (Pop III)  
 # mesa_version=8845 # --> Jacqueline (rotating models, massive stars)
-mesa_version=9331 # --> tested mesa_h5 output with
+# mesa_version=9331 # --> tested mesa_h5 output with
 # mesa_version=10398 
 # mesa_version=12115 # --> Brad RCB stars
-# mesa_version=15140 # --> RCB Brad paper II
+ mesa_version=15140 # --> RCB Brad paper II
 
 
 # probably nothing needs to be changed below here
@@ -32,6 +32,7 @@ then
     then
         svn co -r $mesa_version svn://svn.code.sf.net/p/mesa/code/trunk $mesa_source_dir
     elif [[ $mesa_version == 15140 ]]
+    then
         cd $mesa_user_dir
         wget https://zenodo.org/record/4311514/files/mesa-r15140.zip
         unzip mesa-r15140.zip
@@ -50,8 +51,11 @@ then
     fi
     ln -s $mesa_source_dir $MESA_DIR  # $MESA_DIR is defined in .bash_aliases
     cd $mesa_source_dir/utils
-    sed -i s/"USE_PGSTAR = YES"/"USE_PGSTAR = NO"/g makefile_header
-    sed -i /"LOAD_PGPLOT ="/c\ "LOAD_PGPLOT =" makefile_header
+    if [[ $mesa_version -lt 15140 ]]
+    then
+	sed -i s/"USE_PGSTAR = YES"/"USE_PGSTAR = NO"/g makefile_header
+	sed -i /"LOAD_PGPLOT ="/c\ "LOAD_PGPLOT =" makefile_header
+    fi
     if [[ $mesa_version =~ ^7 ]] || [[ $mesa_version =~ ^5 ]] || [[ $mesa_version =~ ^8 ]] 
     then
         sed -i '/FCbasic = -fno-range-check/s/$/ -Wno-uninitialized/' makefile_header
@@ -76,10 +80,6 @@ then
 	cd star/private
 	sed -i s/"stop'fixup'"/"stop 'fixup'"/g diffusion_procs.f90
 	cd ../..
-    fi
-    if [[ $mesa_version == 15140 ]]
-    then
-    echo MESA version 15140
     fi
     ./clean
     ./install
