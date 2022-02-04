@@ -16,10 +16,10 @@ mesa_user_dir=/user/mesa
 # mesa_version=7184 # --> Austin (massive stars)
 # mesa_version=8118 # --> Ondrea (Pop III)  
 # mesa_version=8845 # --> Jacqueline (rotating models, massive stars)
-# mesa_version=9331 # --> tested mesa_h5 output with
+mesa_version=9331 # --> tested mesa_h5 output with
 # mesa_version=10398 
 # mesa_version=12115 # --> Brad RCB stars
- mesa_version=15140 # --> RCB Brad paper II
+# mesa_version=15140 # --> RCB Brad paper II
 
 
 # probably nothing needs to be changed below here
