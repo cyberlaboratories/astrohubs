@@ -12,6 +12,7 @@
 # define some things
 mesa_user_dir=/user/mesa
 # mesa_version=5329 # --> Pavel (90Msun and supermassive stars)
+# mesa_version=7503 # --> requested by Emma Beasor 
 # mesa_version=7624 # --> Pavel (HB stars, RAWDs), Rob Farmer
 # mesa_version=7184 # --> Austin (massive stars)
 # mesa_version=8118 # --> Ondrea (Pop III)  
@@ -75,7 +76,7 @@ then
 	sed -i s/"stop'fixup'"/"stop 'fixup'"/g mod_diffusion_procs.f
 	cd ../..
     fi
-    if [[ $mesa_version =~ ^9 ]] || [[ $mesa_version =~ ^8 ]] || [[ $mesa_version == 7624 ]]
+    if [[ $mesa_version =~ ^9 ]] || [[ $mesa_version =~ ^8 ]] || [[ $mesa_version == 7624 ]] || [[ $mesa_version == 7503 ]]
     then
 	cd star/private
 	sed -i s/"stop'fixup'"/"stop 'fixup'"/g diffusion_procs.f90
