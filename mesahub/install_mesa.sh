@@ -5,6 +5,17 @@
 # 1: installation location (defaults to /user/mesa)
 # 2: mesa version (defaults 9331)
 #
+echo "************** NOTE START ***************"
+echo "This script will remove the link"
+echo "/user/mesa/mesa (or whatever your"
+echo "mesa_user_dir variable is) and set it"
+echo "to the version specified below. Make"
+echo "sure you avoid having this link overwritten,"
+echo "for example by creating your own link manually"
+echo "for example in /user/scratch14_outreach/your_user_name"
+echo "and updating your MESA_DIR in yoiur .bash_aliases"
+echo "************** NOTE END ***************"
+echo ""
 # This script has been tested on the mesahub application v1.2.6
 # 
 # 2018-2022, Falk Herwig, UVic
@@ -12,12 +23,12 @@
 # define some things
 mesa_user_dir=/user/mesa
 # mesa_version=5329 # --> Pavel (90Msun and supermassive stars)
-# mesa_version=7503 # --> requested by Emma Beasor 
+mesa_version=7503 # --> requested by Emma Beasor 
 # mesa_version=7624 # --> Pavel (HB stars, RAWDs), Rob Farmer
 # mesa_version=7184 # --> Austin (massive stars)
 # mesa_version=8118 # --> Ondrea (Pop III)  
 # mesa_version=8845 # --> Jacqueline (rotating models, massive stars)
-mesa_version=9331 # --> tested mesa_h5 output with
+# mesa_version=9331 # --> tested mesa_h5 output with
 # mesa_version=10398 
 # mesa_version=12115 # --> Brad RCB stars
 # mesa_version=15140 # --> RCB Brad paper II
@@ -88,10 +99,10 @@ then
 else
     if [ -h $MESA_DIR ]
     then
-	rm $MESA_DIR
-	ln -s $mesa_source_dir $MESA_DIR  # $MESA_DIR is defined in .bash_aliases
+        rm $MESA_DIR
     fi
-    
+    ln -s $mesa_source_dir $MESA_DIR  # $MESA_DIR is defined in .bash_aliases
+
     echo "MESA version $mesa_version already installed in $mesa_source_dir."
-    echo "$MESA_DIR points to" $mesa_version
+    echo "Force $MESA_DIR to link to" $mesa_version
 fi
