@@ -29,4 +29,4 @@ scipy==0.19.1
 seaborn==0.8.1
 sympy==1.1.1
 urllib3==1.22
-Werkzeug==0.12.2
+Werkzeug==0.15.5
