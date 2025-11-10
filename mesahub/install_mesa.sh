@@ -27,14 +27,14 @@ echo ""
 # define some things
 mesa_user_dir=/user/mesa
 # mesa_version=5329 # --> Pavel (90Msun and supermassive stars)
-mesa_version=7503 # --> requested by Emma Beasor 
+# mesa_version=7503 # --> requested by Emma Beasor 
 # mesa_version=7624 # --> Pavel (HB stars, RAWDs), Rob Farmer
 # mesa_version=7184 # --> Austin (massive stars)
 # mesa_version=8118 # --> Ondrea (Pop III)  
 # mesa_version=8845 # --> Jacqueline (rotating models, massive stars)
 # mesa_version=9331 # --> tested mesa_h5 output with
 # mesa_version=10398 
-# mesa_version=12115 # --> Brad RCB stars
+ mesa_version=12115 # --> Brad RCB stars
 # mesa_version=15140 # --> RCB Brad paper II
 
 
@@ -44,17 +44,25 @@ mesa_source_dir=$mesa_user_dir/mesa_$mesa_version
 if [ ! -d $mesa_source_dir ]  
 then
     echo Installing into $mesa_user_dir
-    if [ $mesa_version -lt 12115 ]
+
+    https://zenodo.org/records/3473377/files/mesa-r12115.zip
+    
+    if [ $mesa_version == 15140 ]
     then
-        svn co -r $mesa_version svn://svn.code.sf.net/p/mesa/code/trunk $mesa_source_dir
-    elif [[ $mesa_version == 15140 ]]
+	cd "$mesa_user_dir"
+	wget "https://zenodo.org/record/4311514/files/mesa-r${mesa_version}.zip"
+	unzip "mesa-r${mesa_version}.zip"
+	rm "mesa-r${mesa_version}.zip"
+	mv "mesa-r${mesa_version}" "mesa_${mesa_version}"
+	cd "mesa_${mesa_version}"
+    elif [ $mesa_version == 12115 ]
     then
-        cd $mesa_user_dir
-        wget https://zenodo.org/record/4311514/files/mesa-r15140.zip
-        unzip mesa-r15140.zip
-        rm mesa-r15140.zip
-        mv mesa-r15140 mesa_$mesa_version
-        cd mesa_$mesa_version
+        cd "$mesa_user_dir"
+        wget "https://zenodo.org/record/3473377/files/mesa-r${mesa_version}.zip"
+        unzip "mesa-r${mesa_version}.zip"
+        rm "mesa-r${mesa_version}.zip"
+        mv "mesa-r${mesa_version}" "mesa_${mesa_version}"
+        cd "mesa_${mesa_version}"
     else
         svn co -r $mesa_version https://subversion.assembla.com/svn/mesa^mesa/trunk $mesa_source_dir
     fi
