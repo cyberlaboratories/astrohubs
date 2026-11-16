@@ -1,0 +1,241 @@
+#!/bin/bash
+# ai-setup: check and set up your outreach-ai account (cyberlaboratories/astrohubs, outreach-ai).
+#
+#   ai-setup               check everything and say what, if anything, to do
+#   ai-setup fix           walk through what is missing: git name and email, an ssh key, the Claude login
+#   ai-setup key add       store a key of your own (GitHub, NASA ADS, OpenAI, Anthropic, Gemini, OpenRouter, other)
+#   ai-setup key list      the names of your stored keys (never their values)
+#   ai-setup key remove N  delete key N
+#   ai-setup model add     add your own OpenAI-compatible model provider to OpenCode
+#
+# Your home directory is temporary, as on the other Astrohub hubs, but what you set up here (logins, ssh keys, git and
+# OpenCode settings, your keys) is kept in ~/<name>_config/outreach-ai-ini and linked into every new home, so it stays for
+# every later login. Your keys live in ~/.config/outreach-ai/keys.env (readable only by you); every new terminal loads
+# them, and notebooks get them from the next server start. Nothing here prints a key.
+set -uo pipefail
+KEYS="$HOME/.config/outreach-ai/keys.env"
+RESERVED="JUPYTERHUB_API_TOKEN OUTREACH_AI_GATEWAY OUTREACH_AI_INI CLAUDE_CONFIG_DIR GIT_CONFIG_GLOBAL VELA_SPIGOT_API_KEY ALEPH_API_KEY PATH HOME USER SHELL MESA_DIR MESASDK_ROOT OMP_NUM_THREADS NB_USER NB_UID NB_GID"
+
+ok()   { printf "  \033[32mOK\033[0m    %s\n" "$*"; }
+todo() { printf "  \033[33mTODO\033[0m  %s\n" "$*"; }
+bad()  { printf "  \033[31mFAIL\033[0m  %s\n" "$*"; }
+info() { printf "        %s\n" "$*"; }
+
+GATEWAY="${OUTREACH_AI_GATEWAY:-http://outreach-ai-gateway:8080/v1}"
+
+reach() {   # the hub's model gateway holds the shared keys; you reach it with your own hub token
+  if [ -z "${JUPYTERHUB_API_TOKEN:-}" ]; then bad "no hub token in this shell (open a new terminal in JupyterLab)"; return; fi
+  local out c
+  out=$(curl -s -m 20 -w '\n%{http_code}' -H "Authorization: Bearer $JUPYTERHUB_API_TOKEN" "$GATEWAY/models")
+  c=${out##*$'\n'}
+  if [ "$c" = 200 ]; then   # the list is long: piped in, never passed as an argument
+    printf '%s' "${out%$'\n'*}" | python3 -c 'import json,sys; d=json.load(sys.stdin).get("data",[]); o=[m.get("owned_by") for m in d]; print("  \033[32mOK\033[0m    the hub'"'"'s model gateway answers: %d Velella and %d Aleph models" % (o.count("velella"), o.count("aleph")))'
+  else
+    bad "the hub's model gateway answered HTTP $c ($GATEWAY); tell the hub's admin"
+  fi
+}
+
+check() {
+  echo "Your outreach-ai account ($(id -un) on $(hostname))"
+  echo
+  echo "Storage"
+  info "home directory $HOME: temporary, lost when your server stops (as on the other Astrohub hubs)"
+  local cfg="$HOME/${JUPYTERHUB_USER:-}_config"
+  if [ -n "${JUPYTERHUB_USER:-}" ] && [ -d "$cfg" ] && [ "$(findmnt -n -o FSTYPE -T "$cfg")" != overlay ]; then
+    ok "${cfg/#$HOME/~} is your persistent folder"
+    local n=0 l
+    for l in .claude .ssh .config/opencode .local/share/opencode .jupyter/nbi .config/outreach-ai; do
+      [ -L "$HOME/$l" ] && [ -d "$HOME/$l/" ] && n=$((n + 1))
+    done
+    [ "$n" = 6 ] && ok "logins and settings are kept in ${cfg/#$HOME/~}/outreach-ai-ini (6 of 6 linked)" \
+      || bad "only $n of 6 settings folders are linked to ${cfg/#$HOME/~}/outreach-ai-ini; restart your server"
+  else
+    bad "no persistent ~/<name>_config folder; tell the hub's admin"
+  fi
+  [ -w /user/scratch14_outreach ] && ok "shared scratch /user/scratch14_outreach is writable (keep your work there)" || todo "shared scratch /user/scratch14_outreach is not writable"
+
+  echo
+  echo "Open-weight models"
+  reach
+  if [ -f "$HOME/.config/opencode/opencode.json" ] || [ -f "$HOME/.config/opencode/config.json" ]; then
+    local n v a
+    n=$(opencode models 2>/dev/null)
+    v=$(grep -c "^velella/" <<< "$n"); a=$(grep -c "^aleph/" <<< "$n")
+    [ "$v" -ge 1 ] && [ "$a" -ge 1 ] && ok "OpenCode: $v Velella and $a Aleph models (run: opencode)" \
+      || todo "OpenCode lists $v Velella and $a Aleph models; compare ~/.config/opencode/opencode.json with /opt/outreach-ai/skel/opencode.json"
+  else
+    todo "OpenCode has no settings; restart your server (File > Hub Control Panel) to get the defaults"
+  fi
+  if [ -f "$HOME/.jupyter/nbi/config.json" ]; then
+    python3 - "$HOME/.jupyter/nbi/config.json" <<'PY'
+import json, sys
+c = json.load(open(sys.argv[1]))
+m = c.get("chat_model") or {}
+p = {x.get("id"): x.get("value") for x in m.get("properties", []) if isinstance(x, dict)}
+where = p.get("base_url") or m.get("provider", "?")
+print(f"  \033[32mOK\033[0m    JupyterLab chat: {m.get('provider', '?')}, {p.get('model_id', m.get('model', '?'))} at {where}")
+PY
+  else
+    todo "JupyterLab chat has no settings yet; restart your server to get the Velella default"
+  fi
+
+  echo
+  echo "Claude"
+  if [ -s "$HOME/.claude/.credentials.json" ] || [ -n "${ANTHROPIC_API_KEY:-}" ]; then
+    ok "Claude Code is logged in (it keeps the login in ~/.claude)"
+  else
+    todo "Claude Code is not logged in: run 'ai-setup fix', or run 'claude' and type /login (needs a Claude Pro or Max account, or an API key)"
+  fi
+
+  echo
+  echo "Git and ssh"
+  local gn ge
+  gn=$(git config --global user.name 2>/dev/null); ge=$(git config --global user.email 2>/dev/null)
+  [ -n "$gn" ] && [ -n "$ge" ] && ok "git knows you as $gn <$ge>" || todo "git has no name or email: run 'ai-setup fix'"
+  local k
+  k=$(ls "$HOME"/.ssh/id_*.pub 2>/dev/null | head -1)
+  if [ -n "$k" ]; then
+    ok "ssh key ${k/#$HOME/~} (add the .pub file to GitHub or GitLab if you have not)"
+    [ "$(stat -c %a "$HOME/.ssh")" = 700 ] || todo "~/.ssh should be mode 700: chmod 700 ~/.ssh"
+  else
+    todo "no ssh key: 'ai-setup fix' makes one (only needed for git over ssh)"
+  fi
+
+  echo
+  echo "Your own keys"
+  local kn; kn=$(key_names | tr '\n' ' ')
+  [ -n "$kn" ] && ok "stored: $kn(manage with: ai-setup key list | add | remove)" \
+    || info "none stored; GitHub, NASA ADS or other model keys: ai-setup key add"
+  command -v gh >/dev/null && { [ -n "${GH_TOKEN:-}" ] && ok "gh (GitHub) uses your GH_TOKEN" || info "gh (GitHub): store GH_TOKEN with ai-setup key add, or run gh auth login"; }
+
+  echo
+  echo "MESA"
+  if [ -n "${MESA_DIR:-}" ] && [ -d "$MESA_DIR/star" ]; then
+    ok "MESA at \$MESA_DIR=$MESA_DIR"
+    command -v gfortran >/dev/null && ok "MESA SDK loaded: $(gfortran --version | head -1)" || todo "MESA SDK not loaded in this shell: open a new terminal"
+    info "run MESA in /user/scratch14_outreach/${JUPYTERHUB_USER:-yourname} (kept when the server stops); first steps in ~/README.md"
+  else
+    todo "MESA is not mounted (MESA_DIR=${MESA_DIR:-unset}); tell the hub's admin"
+  fi
+  echo
+  echo "Details: ~/README.md"
+}
+
+fix() {
+  echo "ai-setup fix: only what is missing; press Enter to skip a step."
+  if [ -z "$(git config --global user.name 2>/dev/null)" ] || [ -z "$(git config --global user.email 2>/dev/null)" ]; then
+    echo; read -r -p "Your name for git commits: " n
+    read -r -p "Your email for git commits: " e
+    [ -n "$n" ] && git config --global user.name "$n"
+    [ -n "$e" ] && git config --global user.email "$e"
+  fi
+  if ! ls "$HOME"/.ssh/id_*.pub >/dev/null 2>&1; then
+    echo; read -r -p "Make an ssh key for git over ssh? [y/N] " a
+    if [ "${a,,}" = y ]; then
+      mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
+      ssh-keygen -t ed25519 -C "$(id -un)@outreach-ai $(git config --global user.email 2>/dev/null)" -f "$HOME/.ssh/id_ed25519"
+      echo; echo "Your public key (add it at https://github.com/settings/keys or your GitLab's SSH keys page):"
+      cat "$HOME/.ssh/id_ed25519.pub"
+    fi
+  fi
+  if ! { [ -s "$HOME/.claude/.credentials.json" ] || [ -n "${ANTHROPIC_API_KEY:-}" ]; }; then
+    echo; read -r -p "Log in to Claude Code now (needs a Claude Pro or Max account, or an API key)? [y/N] " a
+    if [ "${a,,}" = y ]; then
+      echo "Claude Code starts now. Follow its login, then type /exit to come back."
+      claude
+    fi
+  fi
+  echo; check
+}
+
+# keys.env holds plain NAME=value lines. It is READ, never run as a script (the server's start reads it as root), by
+# the same loop in /etc/bash.bashrc and /usr/local/bin/before-notebook.d/20-outreach-ai-keys.sh.
+key_names() { [ -f "$KEYS" ] && grep -o -E '^[A-Z_][A-Z0-9_]*=' "$KEYS" | sed -E 's/=$//'; }
+
+key_put() {   # NAME VALUE: replace NAME's line in keys.env (0600)
+  mkdir -p "$(dirname "$KEYS")"; chmod 700 "$(dirname "$KEYS")"
+  touch "$KEYS"; chmod 600 "$KEYS"
+  { grep -v -E "^$1=" "$KEYS" || true; printf '%s=%s\n' "$1" "$2"; } > "$KEYS.tmp"
+  chmod 600 "$KEYS.tmp"; mv "$KEYS.tmp" "$KEYS"
+}
+
+key_store() {   # NAME: read the value hidden, write it to keys.env (0600), replacing an older value
+  local name=$1 v
+  case " $RESERVED " in *" $name "*) echo "$name is set by the hub and cannot be stored here."; return 1;; esac
+  [[ "$name" =~ ^[A-Z_][A-Z0-9_]*$ ]] || { echo "A key name is capital letters, digits and _ (e.g. ADS_API_TOKEN)."; return 1; }
+  read -r -s -p "Paste the value for $name (not shown): " v; echo
+  [ -n "$v" ] || { echo "Nothing stored."; return 1; }
+  key_put "$name" "$v"
+  KEY_VALUE=$v
+  echo "Stored $name. New terminals have it now; notebooks after your next server start."
+}
+
+key_add() {
+  echo "Which key?"
+  echo "  1) GitHub token (GH_TOKEN): the gh command and git over https"
+  echo "  2) NASA ADS token (ADS_API_TOKEN, also as ADS_DEV_KEY): the ads Python package"
+  echo "  3) OpenAI API key (OPENAI_API_KEY): OpenCode and other tools"
+  echo "  4) Anthropic API key (ANTHROPIC_API_KEY): note, Claude Code then bills this key, not your subscription"
+  echo "  5) Google Gemini API key (GEMINI_API_KEY): OpenCode"
+  echo "  6) OpenRouter API key (OPENROUTER_API_KEY): OpenCode, many models"
+  echo "  7) another, by name"
+  local c; read -r -p "Number: " c
+  case "$c" in
+    1) key_store GH_TOKEN ;;
+    2) if key_store ADS_API_TOKEN; then key_put ADS_DEV_KEY "$KEY_VALUE"; fi ;;   # the ads package reads either name
+    3) key_store OPENAI_API_KEY ;;
+    4) key_store ANTHROPIC_API_KEY ;;
+    5) key_store GEMINI_API_KEY ;;
+    6) key_store OPENROUTER_API_KEY ;;
+    7) local n; read -r -p "Name (e.g. MY_SERVICE_KEY): " n; key_store "$n" ;;
+    *) echo "Nothing stored." ;;
+  esac
+}
+
+key_remove() {
+  local name=${1:-}
+  [ -n "$name" ] || { echo "usage: ai-setup key remove NAME (see: ai-setup key list)"; return 1; }
+  key_names | grep -qx "$name" || { echo "No stored key $name."; return 1; }
+  grep -v -E "^$name=" "$KEYS" > "$KEYS.tmp"; chmod 600 "$KEYS.tmp"; mv "$KEYS.tmp" "$KEYS"
+  echo "Removed $name (open terminals still have it until they close)."
+}
+
+model_add() {   # an OpenAI-compatible provider of the user's own, added to ~/.config/opencode/opencode.json
+  local id name url env models
+  read -r -p "Short id for the provider (letters, digits, -): " id
+  [[ "$id" =~ ^[a-z0-9-]+$ ]] || { echo "Use lower-case letters, digits and -."; return 1; }
+  read -r -p "Display name: " name
+  read -r -p "Base URL (ends in /v1, e.g. https://api.example.org/v1): " url
+  read -r -p "Name of the key variable (stored with 'ai-setup key add', e.g. MYPROVIDER_API_KEY): " env
+  read -r -p "Model ids, separated by spaces: " models
+  python3 - "$HOME/.config/opencode/opencode.json" "$id" "$name" "$url" "$env" $models <<'PY'
+import json, os, sys
+path, pid, name, url, env, *models = sys.argv[1:]
+cfg = json.load(open(path)) if os.path.exists(path) else {"$schema": "https://opencode.ai/config.json"}
+cfg.setdefault("providers", {})[pid] = {
+    "name": name or pid, "env": [env], "package": "@opencode/ai/providers/openai-compatible",
+    "settings": {"baseURL": url},
+    "models": {m: {"name": f"{m} ({name or pid})", "capabilities": {"tools": True}} for m in models}}
+os.makedirs(os.path.dirname(path), exist_ok=True)
+json.dump(cfg, open(path + ".tmp", "w"), indent=2); os.replace(path + ".tmp", path)
+print(f"Added provider {pid} with {len(models)} model(s) to {path}.")
+PY
+  key_names | grep -qx "$env" || { echo "Now store its key:"; key_store "$env"; }
+  echo "In OpenCode, /models lists them as $id/<model>."
+}
+
+case "${1:-check}" in
+  check) check ;;
+  fix) fix ;;
+  key)
+    case "${2:-list}" in
+      add) key_add ;;
+      list) n=$(key_names); [ -n "$n" ] && { echo "Your stored keys (names only):"; echo "$n" | sed 's/^/  /'; } || echo "No keys stored. Add one: ai-setup key add" ;;
+      remove|rm) key_remove "${3:-}" ;;
+      *) echo "usage: ai-setup key [add|list|remove NAME]"; exit 1 ;;
+    esac ;;
+  model)
+    case "${2:-}" in add) model_add ;; *) echo "usage: ai-setup model add"; exit 1 ;; esac ;;
+  -h|--help|help) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//' ;;
+  *) echo "usage: ai-setup [check|fix|key add|key list|key remove NAME|model add|help]"; exit 1 ;;
+esac

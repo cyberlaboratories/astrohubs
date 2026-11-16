@@ -1,0 +1,37 @@
+# outreach-ai hub on astrohub.uvic.ca (cyberlaboratories/astrohubs, outreach-ai/hub).
+# Secrets are in .env and gateway.env beside this file (mode 0600, root, never in git); the .example files list the names.
+services:
+  hub:
+    build: .
+    image: local/outreach-ai-hub:6.2.0
+    container_name: multiuser_outreach_ai
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock            # DockerSpawner starts the users' containers
+      - ./jupyterhub_config.py:/srv/jupyterhub/jupyterhub_config.py:ro
+      - ./access:/srv/jupyterhub/access:ro                  # wlist: GitHub names, re-read at each login
+      - ./state:/srv/jupyterhub/state                       # hub database and cookie secret
+      - /mnt/jupyterhub_users:/jupyterhub_users             # to create each user's <name>_config folder
+    ports:
+      - "127.0.0.1:10443:8000"                              # nginx: location /outreach-ai -> here
+    networks:
+      - outreach-ai-net
+    command: jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
+
+  # The model gateway: the ONLY place the shared Velella and Aleph keys live. Users' servers reach it on the internal
+  # network as http://outreach-ai-gateway:8080/v1 with their own hub token; it is not published on the host.
+  gateway:
+    build: ./gateway
+    image: local/outreach-ai-gateway:1
+    container_name: outreach-ai-gateway
+    restart: unless-stopped
+    env_file: gateway.env
+    volumes:
+      - ./gateway-log:/var/log/outreach-ai-gateway            # usage.jsonl: user, model, tokens; never request text
+    networks:
+      - outreach-ai-net
+
+networks:
+  outreach-ai-net:
+    name: outreach-ai-net

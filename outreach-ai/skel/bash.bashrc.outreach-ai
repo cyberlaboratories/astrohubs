@@ -1,0 +1,13 @@
+
+# --- outreach-ai (cyberlaboratories/astrohubs outreach-ai) ---
+# JupyterLab's top folder is / (so /data and /user show in the file browser); a terminal opened there starts at home.
+case $- in *i*) [ "$PWD" = / ] && cd "$HOME" ;; esac
+# MESA: when the hub mounts MESA, load its SDK (gfortran, make and friends) in every interactive shell, as the old
+# mesahub did. MESA_DIR and MESASDK_ROOT are set by the hub; see ~/README.md.
+if [ -n "${MESASDK_ROOT:-}" ] && [ -f "${MESASDK_ROOT}/bin/mesasdk_init.sh" ]; then
+  . "${MESASDK_ROOT}/bin/mesasdk_init.sh"
+fi
+# The user's own keys (ai-setup key add), read line by line by the same code the server's start uses.
+[ -r /usr/local/bin/before-notebook.d/20-outreach-ai-keys.sh ] && . /usr/local/bin/before-notebook.d/20-outreach-ai-keys.sh
+# The user's own additions, kept in <name>_config/outreach-ai-ini/bashrc (the home is temporary).
+[ -n "${OUTREACH_AI_INI:-}" ] && [ -r "$OUTREACH_AI_INI/bashrc" ] && . "$OUTREACH_AI_INI/bashrc"
