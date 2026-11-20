@@ -13,7 +13,7 @@ olefile==0.44
 pandas==0.20.3
 Pillow==4.2.1
 protobuf==3.4.0
-py==1.4.34
+py==1.10.0
 pytest==3.2.2
 PyYAML==3.12
 scipy==0.19.1
